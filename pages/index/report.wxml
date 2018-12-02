@@ -23,7 +23,7 @@
         <text class='font30'>分</text>
       </view>
     </view>
-    <view class='clearfix' style='width:330rpx;float:right;'>
+    <view class='clearfix' style='width:330rpx;height:300rpx;float:right;'>
     <image src='{{tempPath}}' wx:if="{{tempPath}}" style='width:330rpx;height:{{330/280*200}}rpx;'></image>
       <canvas canvas-id="attribute" style='width:280px; height:200px;transform: translateX(-2000%);'></canvas>
     </view>
@@ -96,6 +96,14 @@
         </view>
       </view>
     </view>
+    <view class='clearfix' wx:if="{{!hideButton}}">
+      <button class='begin-btn begin-btn2' style='float:left;' open-type="share">分享好友</button>
+      <button class='begin-btn begin-btn' style='color:#fff;float:right;margin-top:20rpx;' bindtap="saveAsImg">保存分享图</button>
+    </view>
+    <view class='clearfix' wx:if="{{hideButton && share}}">
+      <button class='begin-btn begin-btn2' style='float:left;' bindtap='challenge'>体验北漂生活</button>
+      <button class='begin-btn begin-btn' style='color:#fff;float:right;margin-top:20rpx;' bindtap='rankingList'>排行榜</button>
+    </view>
     <view class='survival-txt' style='color:#fff;'>
       <view class='txt-top1'></view>
       <view class='txt-mid1 ' style='font-weight:bold;color:#fff;'>
@@ -153,14 +161,6 @@
         <text class='{{(index==prop.commentArray.length-1)?"color4":""}}' style='{{(index==prop.commentArray.length-1)?"font-size:42rpx;":""}}' wx:for='{{prop.commentArray}}' wx:key="*this" for-index="index">{{item}}{{(index<prop.commentArray.length-1)?"，":""}}</text>
       </view>
       <view class='txt-bottom1'></view>
-    </view>
-    <view class='clearfix' wx:if="{{!hideButton}}">
-      <button class='begin-btn begin-btn2' style='float:left;' open-type="share">分享好友</button>
-      <button class='begin-btn begin-btn' style='color:#fff;float:right;margin-top:20rpx;' bindtap="saveAsImg">保存分享图</button>
-    </view>
-    <view class='clearfix' wx:if="{{hideButton && share}}">
-      <button class='begin-btn begin-btn2' style='float:left;' bindtap='challenge'>体验北漂生活</button>
-      <button class='begin-btn begin-btn' style='color:#fff;float:right;margin-top:20rpx;' bindtap='rankingList'>排行榜</button>
     </view>
   </view>
 </view>

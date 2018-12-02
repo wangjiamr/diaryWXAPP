@@ -59,6 +59,10 @@ const options={
       wx.navigateTo({
         url: `./report?userId=${options.userId}&share=true`,
       })
+    } else if (options.to === 'rankingList') {//by share
+      wx.navigateTo({
+        url: `./rankingList`,
+      })
     }
     wx.showLoading({
       title: '请稍等...',
