@@ -26,7 +26,7 @@
     </view>
     
     <view bindtap='dialogOK' style="position:relative">
-        <form bindsubmit="pushFormSubmit" report-submit='true'>
+        <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionOK">
           <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
           <view class='btn-2' >{{dialogBtn}}</view>
         </form>
@@ -43,7 +43,7 @@
     </view>
 
       <view bindtap='applyEvent' wx:for="{{eventItems}}" wx:key="id" data-id="{{item.id}}" style="position:relative">
-        <form bindsubmit="pushFormSubmit" report-submit='true'>
+        <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionEvent">
           <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
           <view class='btn-2' >
             {{item.resultText}}

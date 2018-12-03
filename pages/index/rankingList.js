@@ -122,21 +122,35 @@ Page({
     
   },
   onShareAppMessage(opt){
+    wx.showShareMenu({
+      withShareTicket: true
+    })
     let title = '全民混北京，三分靠努力，七分靠打拼，剩下九十分靠天意！'
     let imgSrc = ''
     if (app.globalData.shareObj) {
       title = app.globalData.shareObj.title
       imgSrc = app.globalData.shareObj.imgSrc
     }
+    console.info(opt)
     return {
       title: title,
       imageUrl: imgSrc,
       path: '/pages/index/index',
-      success: (res) => {
-        console.log("转发成功", res);
+      success: function (res) {
+        console.info('a')
+        // 转发成功之后的回调
+        if (res.errMsg == 'shareAppMessage:ok') {
+        }
       },
-      fail: (res) => {
-        console.log("转发失败", res);
+      fail: function () {
+        // 转发失败之后的回调
+        if (res.errMsg == 'shareAppMessage:fail cancel') {
+          // 用户取消转发
+        } else if (res.errMsg == 'shareAppMessage:fail') {
+          // 转发失败，其中 detail message 为详细失败信息
+        }
+      }, complete: function () {
+        // 转发结束之后的回调（转发成不成功都会执行）
       }
     }
   }

@@ -301,6 +301,15 @@
               </view>
             </form>
           </view>
+          <view bindtap='actionCouple' style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionCouple">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.coupleLimit==0?"":"disable"}}' >
+                <image src='../../img/gift.png'></image>
+                <text>贵人相助</text>
+              </view>
+            </form>
+          </view>
           <!-- <view class='btn-box clearfix {{userState.coupleLimit==0?"":"disable"}}' bindtap='actionCouple'>
             <image src='../../img/btn-6.png'></image>
             <text>儿女情长</text>
