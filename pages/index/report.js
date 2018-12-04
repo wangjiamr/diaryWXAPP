@@ -185,7 +185,7 @@ Page({
     textColor = '#f6de4b'
     
   } = {}) {
-    const offset = 20, usedHeight = -40
+    const offset = 0, usedHeight = -20
 
     const ctx = wx.createCanvasContext('attribute')
     ctx.save()
