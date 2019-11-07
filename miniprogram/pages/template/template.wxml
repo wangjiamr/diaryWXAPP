@@ -1,0 +1,644 @@
+<wxs src="../../utils/tools.wxs" module="tools" />
+<template name="popNight">
+  <view class='night {{nightClass}}'>
+    <view class='text-center'>{{nightText}}</view>
+        <view class='text-center'>{{nightText}}</view>
+<view class='float-info' style='background:none;color:#ffffff;left:140rpx;right:140rpx;'>{{nightTip}}</view>
+  </view>
+</template>
+<template name="popDialog">
+  <view class='pop pop-result' hidden='{{!dialogShow}}'>
+    <view class='story' style=''>
+      <view class='text-center'><image src='../../img/{{dialogPic}}.png' mode='widthFix'></image></view>
+      <view class='game-result clearfix'>
+            <view class='result-one' wx:for='{{dialogResult}}' wx:key='*this'>
+                <view class='title'>{{item.text}}</view>
+                <view class='clearfix' wx:if='{{item.effectArray&&item.effectArray.length >0}}'>
+                    <view class='view-one' wx:for='{{item.effectArray}}' wx:for-item="effect" wx:key='*this'>
+                        <text>{{effect.attrName}}</text>
+                        <text class='{{effect.op}}'>{{effect.value}}</text>
+                    </view>
+                    
+                </view>
+            </view>
+        </view>
+      <!-- <text>{{dialogText}}</text> -->
+    </view>
+    
+    <view bindtap='dialogOK' style="position:relative">
+        <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionOK">
+          <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+          <view class='btn-2' >{{dialogBtn}}</view>
+        </form>
+      </view>
+  </view>
+</template>
+<template name="popEvent">
+  <view class='pop pop-result' hidden='{{!eventShow}}'>
+    <view class='story' style='height:350rpx;min-height:200px;'>
+      <view class='text-center'>
+        <image src='../../img/ouyu.png' mode='widthFix'></image>
+      </view>
+      <view class='text-center'>{{eventTitle}}</view>
+    </view>
+
+      <view bindtap='applyEvent' wx:for="{{eventItems}}" wx:key="id" data-id="{{item.id}}" style="position:relative">
+        <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionEvent">
+          <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+          <view class='btn-2' >
+            {{item.resultText}}
+          </view>
+        </form>
+      </view>
+  </view>
+</template>
+
+<template name="popPlan">
+  <view class='pop pop2' hidden='{{!planShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-2.png' ></image>
+      <text>四处逛逛</text>
+      <view class='off' bindtap='closePlan'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>个人能力成长，每次消耗 1 个小时</text>
+          </view>
+      </view>
+      <view wx:for='{{planItems}}' wx:key='id' bindtap='applyPlan' data-id='{{item.id}}' style="position:relative">
+        <form bindsubmit="pushFormSubmit" report-submit='true'>
+          <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:110rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+          <view class='feed  {{tools.isEnableMoneyBtn(userState.hours,userState.moneyNumber,item.title)?"":"disable"}}' >
+              <view>{{item.remarks}}</view>
+              <view>{{item.title}}</view>
+          </view>
+        </form>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popJob">
+  <view class='pop pop2' hidden='{{!jobShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-1.png' ></image>
+      <text>找工作</text>
+      <view class='off' bindtap='closeJob'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text >减少健康、增加工作能力，每日限 1 次</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{jobItems}}' wx:key='id'>
+        <view class='feed2-left'>
+          <view class='job'>{{item.title}}</view>
+          <view class='money'>每日工资{{item.price}}元</view>
+          <view>{{item.remarks}}</view>
+        </view>
+        <view wx:if='{{userState.myJobId===item.id}}' class='job-btn in-job disable' ></view>
+        <view wx:else class='job-btn  {{userState.jobLimit==0?"":"disable"}}' bindtap='applyJob' data-id='{{item.id}}'></view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popMyJob">
+  <view class='pop pop2' hidden='{{!myJobShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-1.png'></image>
+      <text>我的工作</text>
+      <view class='off' bindtap='closeMyJob'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>在职期间,每天会带来金钱收入</text>
+          </view>
+      </view>
+      <block wx:for='{{jobItems}}' wx:key='id'>
+        <view class='feed2 clearfix' wx:if='{{userState.myJobId===item.id}}'>
+          <view class='feed2-left'>
+            <view class='job'>{{item.title}}</view>
+            <view class='money'>每日工资{{item.price}}元</view>
+            <view>{{item.remarks}}</view>
+          </view>
+          <view  class='job-btn in-job disable'></view>
+        </view>
+      </block>
+    </view>
+  </view>
+</template>
+
+
+
+<template name="popHouse">
+  <view class='pop pop2' hidden='{{!houseShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-8.png' ></image>
+      <text>购房置业</text>
+      <view class='off' bindtap='closeHouse'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加健康、人脉、快乐，每日限 1 次</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{houseItems}}' wx:key='id'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+              <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myHouseNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mini1 {{tools.isEnableDynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy,userState.moneyNumber,userState.houseLimit)?"":"disable"}}' bindtap='buyHouse' data-id='{{item.id}}'>购 买</view>
+          <view class='btn-mini2 {{(userState.houseLimit==0&&tools.arrayContain(userState.myHouseArray,item.id))?"":"disable"}}'
+           bindtap='sellHouse' data-id='{{item.id}}'>出 售</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popMyHouse">
+  <view class='pop pop2' hidden='{{!myHouseShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-8.png' ></image>
+      <text>我的房产</text>
+      <view class='off' bindtap='closeMyHouse'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加健康、人脉、快乐</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{houseItems}}' wx:key='id' wx:if='{{tools.arrayContain(userState.myHouseArray,item.id)}}'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+              <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myHouseNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mid2 {{(userState.houseLimit==0&&tools.arrayContain(userState.myHouseArray,item.id))?"":"disable"}}'
+             bindtap='sellCar' data-id='{{item.id}}'>出 售</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+
+<template name="popCar">
+  <view class='pop pop2' hidden='{{!carShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-9.png' ></image>
+      <text>座驾排场</text>
+      <view class='off' bindtap='closeCar'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加快乐、人脉，每日限 1 次</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{carItems}}' wx:key='id'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+             <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myCarNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mini1 {{tools.isEnableDynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy,userState.moneyNumber,userState.carLimit)?"":"disable"}}' bindtap='buyCar' data-id='{{item.id}}'>购 买</view>
+          <view class='btn-mini2 {{(userState.carLimit==0&&tools.arrayContain(userState.myCarArray,item.id))?"":"disable"}}'
+           bindtap='sellCar' data-id='{{item.id}}'>出 售</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popMyCar">
+  <view class='pop pop2' hidden='{{!myCarShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-9.png' ></image>
+      <text>我的座驾</text>
+      <view class='off' bindtap='closeMyCar'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加快乐、人脉</text>
+          </view>
+      </view>
+      
+      <view class='feed2 clearfix' wx:for='{{carItems}}' wx:key='id' wx:if='{{tools.arrayContain(userState.myCarArray,item.id)}}'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+             <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myCarNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mid2 {{(userState.carLimit==0&&tools.arrayContain(userState.myCarArray,item.id))?"":"disable"}}'
+            bindtap='sellCar' data-id='{{item.id}}'>出 售</view>
+      </view>
+      
+    </view>
+  </view>
+</template>
+
+
+<template name="popClothes">
+  <view class='pop pop2' hidden='{{!clothesShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-10.png' ></image>
+      <text>着装衣品</text>
+      <view class='off' bindtap='closeClothes'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加美貌、健康、工作能力，每日限 1 次</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{clothesItems}}' wx:key='id'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+              <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myClothesNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mini1 {{tools.isEnableDynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy,userState.moneyNumber,userState.clothesLimit)?"":"disable"}}' bindtap='buyClothes' data-id='{{item.id}}'>购 买</view>
+          <view class='btn-mini2 {{(userState.clothesLimit==0&&tools.arrayContain(userState.myClothesArray,item.id))?"":"disable"}}'
+           bindtap='sellClothes' data-id='{{item.id}}'>出 售</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popMyClothes">
+  <view class='pop pop2' hidden='{{!myClothesShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-10.png' ></image>
+      <text>我的衣品</text>
+      <view class='off' bindtap='closeMyClothes'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加美貌、健康、工作能力</text>
+          </view>
+      </view>
+      
+      <view class='feed2 clearfix' wx:for='{{clothesItems}}' wx:key='id' wx:if='{{tools.arrayContain(userState.myClothesArray,item.id)}}'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+              <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myClothesNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mid2 {{(userState.clothesLimit==0&&tools.arrayContain(userState.myClothesArray,item.id))?"":"disable"}}'
+            bindtap='sellClothes' data-id='{{item.id}}'>出 售</view>
+      </view>
+      
+    </view>
+  </view>
+</template>
+
+
+<template name="popLuxury">
+  <view class='pop pop2' hidden='{{!luxuryShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-12.png' ></image>
+      <text>妆容排场</text>
+      <view class='off' bindtap='closeLuxury'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加快乐、美貌、知名度，每日限 1 次</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{luxuryItems}}' wx:key='id'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+              <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myLuxuryNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mini1 {{tools.isEnableDynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy,userState.moneyNumber,userState.luxuryLimit)?"":"disable"}}' bindtap='buyLuxury' data-id='{{item.id}}'>购 买</view>
+          <view class='btn-mini2 {{(userState.luxuryLimit==0&&tools.arrayContain(userState.myLuxuryArray,item.id))?"":"disable"}}'
+           bindtap='sellLuxury' data-id='{{item.id}}'>出 售</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popMyLuxury">
+  <view class='pop pop2' hidden='{{!myLuxuryShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-12.png' ></image>
+      <text>我的排场</text>
+      <view class='off' bindtap='closeMyLuxury'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>增加快乐、美貌、知名度</text>
+          </view>
+      </view>
+      
+      <view class='feed2 clearfix' wx:for='{{luxuryItems}}' wx:key='id' wx:if='{{tools.arrayContain(userState.myLuxuryArray,item.id)}}'>
+          <view class='feed2-left'>
+              <view class='job'>{{item.title}}</view>
+              <view class='money'>购买价格：{{tools.dynamicPrice(userState.currentDay,item.buyPrice,item.offsetBuy)}}</view>
+              <view class='money money2'>出售价格：{{tools.dynamicPrice(userState.currentDay,item.sellPrice,item.offsetSell)}}</view>
+              <view>
+                  <text>{{item.remarks}}</text>
+                  <text>拥有：{{tools.getHaveNumber(userState.myLuxuryNumber,item.id)}}</text>
+              </view>
+          </view>
+          <view class='btn-mid2 {{(userState.luxuryLimit==0&&tools.arrayContain(userState.myLuxuryArray,item.id))?"":"disable"}}'
+            bindtap='sellLuxury' data-id='{{item.id}}'>出 售</view>
+      </view>
+      
+    </view>
+  </view>
+</template>
+
+
+<template name="popLuck">
+  <view class='pop pop2' hidden='{{!luckShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-4.png' ></image>
+      <text>时来运转</text>
+      <view class='off' bindtap='closeLuck'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>屌丝逆袭，赢了单车变摩托，每日限 1 次</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for="{{luckItems}}" wx:key="id">
+            <view class='feed2-left'>
+                <view class='job'>{{item.title}}</view>
+                <view class='money'>
+                    <text>投{{item.investPrice}}</text>
+                </view>
+                <view>有概率获得{{item.gainPrice}}钱</view>
+            </view>
+            <view class='btn-mid  {{userState.moneyNumber>=item.investPrice&&userState.luckLimit==0?"":"disable"}}' bindtap='applyLuck' data-id='{{item.id}}'>试一次</view>
+        </view>
+    </view>
+  </view>
+</template>
+
+
+
+<template name="popCouple">
+  <view class='pop pop2' hidden='{{!coupleShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-6.png' ></image>
+      <text>儿女情长</text>
+      <view class='off' bindtap='closeCouple'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text >安之若素，冷暖自知。每日限 1 次</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{coupleItems}}' wx:key='id'>
+        <view class='feed2-left'>
+          <view class='job'>{{item.title}}</view>
+          <view class='money'>
+            <text class='{{tools.isCouple(coupleState,item.id)?"":"disable"}}'>{{tools.getCoupleStateName(coupleState,item.id)}}</text>
+            <image wx:if='{{tools.isCouple(coupleState,item.id)}}' src='{{tools.getCoupleStateAvatar(coupleState,item.id)}}' class='user-photo' mode='widthFix'></image>
+          </view>
+          <view>{{item.remarks}}</view>
+        </view>
+        <view wx:if='{{userState.myCoupleId===item.id}}' class='mf-btn2 {{userState.coupleLimit==0?"":"disable"}}' 
+        bindtap='breakUp' data-id='{{item.id}}'></view>
+        <view wx:else class='mf-btn  {{userState.coupleLimit==0?"":"disable"}}' bindtap='relationship' data-id='{{item.id}}'></view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popMyCouple">
+  <view class='pop pop2' hidden='{{!myCoupleShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-6.png' ></image>
+      <text>我的伴侣</text>
+      <view class='off' bindtap='closeMyCouple'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>全世界都充满了恋爱的酸臭味</text>
+          </view>
+      </view>
+      <view class='feed2 clearfix' wx:for='{{coupleItems}}' wx:key='id' wx:if='{{userState.myCoupleId===item.id}}'>
+        <view class='feed2-left'>
+          <view class='job'>{{item.title}}</view>
+          <view class='money'>
+            <text>当前对象：{{userData.nickName}}</text>
+            <image src='{{userData.avatarUrl}}' class='user-photo' mode='widthFix'></image>
+          </view>
+          <view>{{item.remarks}}</view>
+        </view>
+        <view class='mf-btn2 {{(userState.coupleLimit==0&&userState.myCoupleId===item.id)?"":"disable"}}' 
+        bindtap='breakUp' data-id='{{item.id}}'></view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<template name="popTip">
+  <view class='pop pop2' hidden='{{!tipShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/ques.png' ></image>
+      <text>提示</text>
+      <view class='off' bindtap='closeTip'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <block wx:for='{{tipItems}}' wx:key='id'>
+        <view class='feed2 clearfix' wx:if='{{userData.gender==item.gender||item.gender==0}}' >
+          <view class='feed2-left' style="width:100%">
+              <view class='money'>{{item.title}}</view>
+              <view >{{item.remarks}}</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+</template>
+
+
+
+
+<template name="popFund">
+  <view class='pop pop2' hidden='{{!fundShow}}'>
+    <view class='pop2-title clearfix'>
+      <image src='../../img/btn-3.png' ></image>
+      <text>理财投资</text>
+      <view class='off' bindtap='closeFund'>
+        <image src='../../img/off.png'></image>
+      </view>
+    </view>
+    <view class='pop-main'>
+      <view class='tip'>
+          <view class='tip-inner'>
+              <image src='../../img/t.png' mode='widthFix'></image>
+              <text>走势反着买，别墅靠大海！每日限 1 次</text>
+          </view>
+      </view>
+       <view class='feed2 clearfix' wx:for="{{fundItems}}" wx:key="id">
+            <view class='feed2-left'>
+                <view class='job'>{{item.title}}</view>
+                <view class='money'>
+                    <text class='{{tools.arrayContain(userState.myFundArray,item.id)?"":"disable"}}'>{{tools.arrayContain(userState.myFundArray,item.id)?'已投资':'未投资'}}</text>
+                    <text class='percent {{item.increase>0?"up":"down"}}'>{{item.increase}}%</text>
+                    <image src='../../img/arrow-{{item.increase>0?"up":"down"}}.png' mode='widthFix'></image>
+                </view>
+                <view>{{item.remarks}}</view>
+            </view>
+            <view class='btn-mid' class='btn-mid {{userState.fundLimit==0?"":"disable"}}' bindtap='actionFundDetail' data-item='{{item}}'>去看看</view>
+        </view>
+       </view>
+  </view>
+</template>
+<template name="popFundDetail">
+  <view class='pop pop2' hidden='{{!fundDetailShow}}'>
+      <view class='pop2-title clearfix'>
+          <image src='../../img/btn-3.png' ></image>
+          <text style='margin-left:40rpx;'>{{fundItem.title}}</text>
+          <view class='off' bindtap='closeFundDetail'>
+            <image src='../../img/off.png'></image>
+          </view>
+      </view>
+      <view class='pop-main'>
+          <view class='item-box item-box2 item-box3 clearfix'>
+              <view class="one">
+                  <view class="one-inner clearfix">
+                      <text class='clearfix'>
+                          <text>可用金额</text>
+                      </text>
+                      <text class="num-big">
+                          <text class="numFont color2">{{userState.money}}</text>
+                      </text>
+                  </view>
+              </view>
+              <view class="one">
+                  <view class="one-inner clearfix">
+                      <text class='clearfix'>
+                          <text>已经投资</text>
+                      </text>
+                      <text class="num-big">
+                          <text class="numFont color2">{{fundMoney||0}}</text>
+                      </text>
+                  </view>
+              </view>
+              <view class="one">
+                  <view class="one-inner clearfix">
+                      <text class='clearfix'>
+                          <text>今日涨跌</text>
+                      </text>
+                      <text class="num-big">
+                          <!-- <text class="numFont down">-34.3%</text> -->
+                          <text class='numFont {{fundItem.increase>0?"up":"down"}}'>{{fundItem.increase}}%</text>
+                      </text>
+                  </view>
+              </view>
+              
+              <view class="one">
+                  <view class="one-inner clearfix">
+                      <text class='clearfix'>
+                          <text>盈亏</text>
+                      </text>
+                      <text class="num-big">
+                          <text class='numFont {{tools.isPositive(diffMoney)?"up":"down"}}'> {{diffMoney}}</text>
+                      </text>
+                  </view>
+              </view>
+          </view>
+          <view class='chart' id='cvsWrap' style='height:300rpx;'>
+          <canvas canvas-id="kline" style='width:{{canvasWidth}}px; height:{{canvasHeight}}px;'></canvas>
+          </view>
+          <view class='chart-input clearfix'>
+              <input type='digit' placeholder='请输入买入金额' bindinput='bindBuyInput' value='{{buyMoney}}' style="text-indent:10rpx"></input>
+              <button class='begin-btn  {{userState.fundLimit==0?"":"disable"}}' bindtap='applyFundBuy' data-id="{{fundItem.id}}">确认买入</button>
+          </view>
+          <view class='chart-input clearfix'>
+              <input type='digit' placeholder='请输入卖出金额'bindinput='bindSellInput' value='{{sellMoney}}' style="text-indent:10rpx"></input>
+              <button class='begin-btn begin-btn2  {{userState.fundLimit==0?"":"disable"}}' bindtap='applyFundSell' data-id="{{fundItem.id}}" data-money='{{fundMoney}}'>确认卖出</button>
+          </view>
+      </view>
+  </view>
+</template>

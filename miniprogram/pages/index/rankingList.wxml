@@ -1,0 +1,141 @@
+<!--pages/index/RankingList.wxml-->
+<wxs src="../../utils/tools.wxs" module="tools" />
+
+<view class='body-bg' style='display:;'>
+    <view class='img-auto'><image src='../../img/phb.png' mode='widthFix' style="margin-top:10rpx;height:auto" ></image></view>
+    <view class='game-main game-phb'>
+        <view class='top-title tab-title clearfix'>
+            <view class='{{activeType=="score"?"active":""}}' data-activeType='score' bindtap='selected'>综合排行</view>
+            <view class='{{activeType=="asset"?"active":""}}' data-activeType='asset' bindtap='selected'>财富排行</view>
+            <view class='{{activeType=="attrScore"?"active":""}}' data-activeType='attrScore' bindtap='selected'>属性排行</view>
+            <view class='{{activeType=="couple"?"active":""}}' data-activeType='couple' bindtap='selected'>食色性也</view>
+        </view>
+        <view class='top-title' bindtap='viewMyReport' hidden="{{!show}}" wx:if='{{myData.avatarUrl&&activeType!=="couple"}}'>
+            <view class='pull-left view1'>
+                <view><text class='numFont font40 color2'>{{myData.seq}}</text></view>
+                <view><text class='font24 color2'>我的排名</text></view>
+            </view>
+            <view class='pull-left view2 clearfix' style='height:auto;'>
+                <view class='text-center user-img-box'>
+                    <view class='user-img'>
+                        <image src='{{myData.avatarUrl}}'></image>
+                    </view>
+                </view>
+                <view class='font24' style='padding:30rpx 20rpx 0 0'>{{myData.nickName}}<image src='../../img/icon-{{myData.gender==1?"men":"gilr"}}.png' mode='widthFix' style='width:24rpx;height:24rpx;padding-left:2rpx;'></image></view>
+                <view wx:if='{{myData.score>0}}' class='tag-png'><image style='height:auto;' src='../../img/{{myData.comment}}-j.png' mode='widthFix' wx:if="{{myData.comment}}"></image></view>
+            </view>
+            <view class='view3'>
+                <block wx:if='{{activeType==="score"}}'>
+                  <text class='numFont font54'>{{myData.score||'-- '}}</text>
+                  <text class='font30'>分</text>
+                </block>
+                <block wx:elif='{{activeType==="asset"}}'>
+                  <text class='numFont font54'>{{myData.asset||'-- '}}</text>
+                  <text class='font30'>¥</text>
+                </block>
+                <block wx:elif='{{activeType==="attrScore"}}'>
+                  <text class='numFont font54'>{{myData.attrScore||'-- '}}</text>
+                  <text class='font30'>分</text>
+                </block>
+            </view>
+        </view>
+        <view class='begin-txt-box' hidden="{{!show}}" wx:if='{{activeType!=="couple"}}'>
+            <view class='begin-txt-main'>
+              <text class='color2'>近期会开放冲榜有奖活动 奖品暂定女生喜爱的口红</text>
+              <image src='../../img/kouhong.png' mode='widthFix' style='width:36rpx;height:36rpx;padding-left:2rpx;'></image>
+              <text>\n</text>
+              <text class='color2'>综合排行 <text class='color4'>（最高一位）</text></text>
+              <text>\n</text>
+              <text class='color2'>财富排行 <text class='color4'>（最高一位）</text></text>
+              <text>\n</text>
+              <text class='color2'>属性排行 <text class='color4'>（最高一位）</text></text>
+              <text>\n</text>
+              <text>\n</text>
+                <view class='phb-title clearfix'>
+                    <text class='font30'>历史最高</text>
+                    <text class='loop-text'>上次更新时间：{{lastUpdate}}</text>
+                    <!-- <text>上次更新时间：{{lastUpdate}}</text>
+                    <text>上次更新时间：{{lastUpdate}}</text> -->
+                </view>
+                <view class='phb-list'>
+                    <view class='list-one clearfix' wx:for="{{list}}" wx:key="id" bindtap='viewReport' data-id="{{item.id}}">
+                        <view class='pull-left view1'>
+                            <image style='height:auto;' src='../../img/p-1.png' mode='widthFix' wx:if="{{index===0}}"></image>
+                            <image style='height:auto;' src='../../img/p-2.png' mode='widthFix' wx:elif="{{index===1}}"></image>
+                            <image style='height:auto;' src='../../img/p-3.png' mode='widthFix' wx:elif="{{index===2}}"></image>
+                            <view wx:elif="{{index>2}}"><text class='numFont font60 color2'>{{index+1}}</text></view>
+                        </view>
+                        <view class='pull-left view2 clearfix'>
+                            <view class='text-center user-img-box'>
+                                <view class='user-img'>
+                                    <image src='{{item.avatarUrl}}'></image>
+                                </view>
+                            </view>
+                            <view class='font24' style='padding:30rpx 20rpx 0 0'>{{item.nickName}}<image src='../../img/icon-{{item.gender==1?"men":"gilr"}}.png' mode='widthFix' style='width:24rpx;height:24rpx;padding-left:2rpx;'></image></view>
+                            <view class='tag-png'>
+                              <image style='height:auto;' src='../../img/{{item.comment}}-j.png' mode='widthFix' wx:if='{{item.comment}}' ></image>
+                            </view>
+                        </view>
+                        <view class=' view3'>
+                            <view style='height:50rpx;'>
+                              <block wx:if='{{activeType==="score"}}'>
+                                <text class='numFont font43'>{{item.score||'--'}}</text>
+                                <text class='font30'>分</text>
+                              </block>
+                              <block wx:elif='{{activeType==="asset"}}'>
+                                <text class='numFont font43'>{{item.asset||'--'}}</text>
+                                <text class='font30'>¥</text>
+                              </block>
+                              <block wx:elif='{{activeType==="attrScore"}}'>
+                                <text class='numFont font43'>{{item.attrScore||'--'}}</text>
+                                <text class='font30'>分</text>
+                              </block>
+                            </view>
+                            <!-- <view class='like active'><view></view><text>98</text></view> -->
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+
+        <view class='begin-txt-box' hidden="{{!show}}" wx:if='{{activeType==="couple"}}'>
+            <view class='begin-txt-main'>
+              <text class='color2'>守擂制，系统会记录交往当时的最高属性，重新混不会清除关系</text>
+              <text>\n</text>
+              <text>\n</text>
+                <view class='phb-title clearfix'>
+                    <text class='font30'>单局排行</text>
+                    <text class='loop-text'>上次更新时间：{{lastUpdate}}</text>
+                    <!-- <text>上次更新时间：{{lastUpdate}}</text>
+                    <text>上次更新时间：{{lastUpdate}}</text> -->
+                </view>
+                <view class='phb-list'>
+                    <view class='list-one clearfix' wx:for="{{coupleArray}}" wx:key="id">
+                        
+                        <view class='pull-left view2 clearfix'>
+                            <view class='text-center user-img-box'>
+                                <view class='user-img'>
+                                    <image src='{{item.avatarUrl}}'></image>
+                                </view>
+                            </view>
+                            <view class='font24' style='padding:30rpx 20rpx 0 0'>{{item.nickName}}<image src='../../img/icon-{{item.gender==1?"men":"gilr"}}.png' mode='widthFix' style='width:24rpx;height:24rpx;padding-left:2rpx;'></image></view>
+                            <view class='tag-png'>
+                              <image style='height:auto;' src='../../img/{{item.comment}}-j.png' mode='widthFix' wx:if='{{item.comment}}' ></image>
+                            </view>
+                        </view>
+                        <view class='pull-left view1' style='width:140rpx!important'>
+                              <view ><text class='font22 color2'>{{item.coupleName}}的对象</text></view>
+                        </view>
+                        <view class=' view3'>
+                            <view style='height:50rpx;'>
+                              <text class='numFont font36'>{{item.require}}</text>
+                                <text class='font30'>+</text>
+                            </view>
+                            <!-- <view class='like active'><view></view><text>98</text></view> -->
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>
