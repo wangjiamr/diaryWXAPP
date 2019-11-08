@@ -1,0 +1,355 @@
+<import src="../template/template.wxml" />
+<wxs src="../../utils/tools.wxs" module="tools" />
+<view class='body-bg' wx:if='{{!hasUserInfo}}'>
+  <view class='img-auto'>
+    <image src='../../img/slogan.png' mode='widthFix' style='height:auto'></image>
+  </view>
+
+  <block wx:if='{{!waitLoading}}'>
+    <view class='text-center user-img-box'>
+      <view class='user-img'>
+        <image wx:if='{{hasAuth}}' src='{{userData.avatarUrl||"../../img/photo-no.png"}}'></image>
+        <image wx:elif='{{!hasAuth}}' src='../../img/photo-no.png'></image>
+      </view>
+    </view>
+    <view class='text-center user-name' style='position:relative;' bindtap='viewMyReport'>
+      <text wx:if='{{hasAuth}}'>{{userData.nickName}}</text>
+      <text wx:elif='{{!hasAuth}}'>需要你的公开头像和昵称</text>
+      <image wx:if='{{userData.gender==2}}' src='../../img/icon-gilr.png' mode='widthFix' style='width:24rpx;height:24rpx;'></image>
+      <image wx:elif='{{userData.gender==1}}' src='../../img/icon-men.png' mode='widthFix' style='width:24rpx;height:24rpx;'></image>
+      <!-- <view class='tag-img' style='position:absolute;left:430rpx;top:-60rpx;' wx:if='{{lastComment&&currentDays==0&&currentHours==0}}'>
+            <image src='../../img/{{lastComment}}.png' mode='widthFix'  style='height:auto' ></image>
+        </view> -->
+    </view>
+    <view class='begin-txt-box'>
+      <view class='begin-txt-main'>
+        <text>体验北漂生活，生存不仅需要朋友和金钱，更需要对社会、人性的了解。三分靠努力，七分靠打拼，剩下九十分靠天意！混在北京，是好是坏，都能混的下去。</text>
+      </view>
+    </view>
+    <view bindtap="gameStart" style="position:relative"  wx:if='{{hasAuth}}'>
+      <form bindsubmit="pushFormSubmit" report-submit='true' data-action="gameStart">
+        <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+        <view class='begin-btn'>{{(lastComment&&currentDays==0&&currentHours==0)?"重新混":"开始混"}}</view>
+      </form>
+    </view>
+
+    <view bindtap="viewRankingList" style="position:relative"  wx:if='{{hasAuth}}'>
+      <form bindsubmit="pushFormSubmit" report-submit='true' data-action="viewRanking">
+        <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+        <view class='begin-btn begin-btn2'>排行榜</view>
+      </form>
+    </view>
+
+    <view bindtap="viewHelp" style="position:relative"  wx:if='{{hasAuth}}'>
+      <form bindsubmit="pushFormSubmit" report-submit='true' data-action="viewHelp">
+        <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:91rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+        <view class='begin-btn begin-btn3'>玩法说明</view>
+      </form>
+    </view>
+    <!-- <view class='btns-item clearfix'>
+       <form report-submit="true" bindsubmit='viewRankingList' wx:if='{{hasAuth}}' >
+          <button class='begin-btn begin-btn2' formType="submit" >排行榜</button>
+       </form>
+       <form report-submit="true" bindsubmit='viewRankingList' wx:if='{{hasAuth}}' >
+        <button  class='begin-btn begin-btn3'>玩法说明</button>
+       </form>
+      </view> -->
+    <button wx:if='{{!hasAuth}}' class='begin-btn' open-type='getUserInfo' lang='zh_CN' bindgetuserinfo='gameAuth'>去授权</button>
+
+  </block>
+  <!-- <view class='begin-btn begin-btn2' bindtap='viewReport'>temp生存结果</view> -->
+</view>
+<view class='game-main' wx:if='{{hasUserInfo}}'>
+  <view class='top-title'>
+    <image class='icon-1' src='../../img/icon-1.png' mode="widthFix" style='height:auto'></image>
+    <text class='num-box'>游戏还剩<text class='numFont font60 color1'>{{userState.days}}</text>天</text>
+    <image class='icon-2' src='../../img/line-bg.png' mode="widthFix" style='height:auto'></image>
+    <image class='icon-1' src='../../img/icon-2.png' mode="widthFix" style='height:auto'></image>
+    <text class='num-box'>今日还剩<text class='numFont font60 color1'>{{userState.hours}}</text>小时</text>
+    <form report-submit="true" bindsubmit='nextDay' wx:if='{{userState.days>0}}'>
+      <button class='next-day' formType="submit"></button>
+    </form>
+    <form report-submit="true" bindsubmit='done' wx:if='{{userState.days==0}}'>
+      <button class='end' formType="submit"></button>
+    </form>
+
+
+
+  </view>
+  <view class='game-info clearfix {{userState.live?"":"die"}}'>
+    <view class='pull-left'>
+      <view class='pull-left-inner'>
+        <view class='title-img'>
+          <image src="../../img/title-left.png" mode="widthFix" style='height:auto'></image>
+        </view>
+        <view class='one' wx:for='{{attrList}}' wx:key='value'>
+          <view class='one-inner clearfix'>
+            <block wx:if='{{item.length === 2}}'>
+              <text class='clearfix'>
+              <text class='pull-left'>{{item.textArray[0]}}</text>
+              <text class='pull-ight'>{{item.textArray[1]}}</text>
+              </text>
+            </block>
+            <block wx:else>
+              <text>{{item.text}}</text>
+            </block>
+            <block wx:if='{{item.value==="fund"}}'>
+              <image wx:if='{{userState["diffFundMoney"]>0}}' src='../../img/arrow-up.png' style='width:20rpx;height:20rpx;' mode='widthFix'></image>
+              <image wx:elif='{{userState["diffFundMoney"]<0}}' src='../../img/arrow-down.png' style='width:20rpx;height:20rpx;' mode='widthFix'></image>
+            </block>
+            <text class='num-big'>
+                <text wx:if='{{userState[item.value+"Length"] <= 3}}' class='numFont font60 color{{userState[item.value+"Color"]}}'>{{userState[item.value]}}</text>
+            <text wx:elif='{{userState[item.value+"Length"] <= 7}}' class='numFont font40 color{{userState[item.value+"Color"]}}'>{{userState[item.value]}}</text>
+            <text wx:else class='numFont font30 color{{userState[item.value+"Color"]}}'>{{userState[item.value]}}</text>
+            </text>
+          </view>
+        </view>
+
+        <block>
+
+          <view class='one' wx:if="{{userData.gender==1}}">
+            <view class='one-inner clearfix'>
+              <text>我的房产</text>
+              <view class='menu-btn'>
+                <image wx:if='{{userState.myHouseArray.length>0}}' src='../../img/icon-menu.png' bindtap='showMyHouse'></image>
+                <image wx:else src='../../img/icon-menu-dis.png'></image>
+              </view>
+            </view>
+          </view>
+          <view class='one' wx:if="{{userData.gender==1}}">
+            <view class='one-inner clearfix'>
+              <text>我的座驾</text>
+              <view class='menu-btn'>
+                <image wx:if='{{userState.myCarArray.length>0}}' src='../../img/icon-menu.png' bindtap='showMyCar'></image>
+                <image wx:else src='../../img/icon-menu-dis.png'></image>
+              </view>
+            </view>
+          </view>
+          <!--female prop -->
+          <view class='one' wx:if="{{userData.gender==2}}">
+            <view class='one-inner clearfix'>
+              <text>我的衣品</text>
+              <view class='menu-btn'>
+                <image wx:if='{{userState.myClothesArray.length>0}}' src='../../img/icon-menu.png' bindtap='showMyClothes'></image>
+                <image wx:else src='../../img/icon-menu-dis.png'></image>
+              </view>
+            </view>
+          </view>
+          <view class='one' wx:if="{{userData.gender==2}}">
+            <view class='one-inner clearfix'>
+              <text>我的排场</text>
+              <view class='menu-btn'>
+                <image wx:if='{{userState.myLuxuryArray.length>0}}' src='../../img/icon-menu.png' bindtap='showMyLuxury'></image>
+                <image wx:else src='../../img/icon-menu-dis.png'></image>
+              </view>
+            </view>
+          </view>
+          <!--common prop-->
+          <view class='one'>
+            <view class='one-inner clearfix'>
+              <text class='clearfix'>
+              <text class='pull-left'>伴</text>
+              <text class='pull-right'>侣</text>
+              </text>
+              <view class='menu-btn'>
+                <image wx:if='{{userState.myCoupleId.length>0}}' src='../../img/icon-menu.png' bindtap='showMyCouple'></image>
+                <image wx:else src='../../img/icon-menu-dis.png'></image>
+              </view>
+            </view>
+          </view>
+          <view class='one'>
+            <view class='one-inner clearfix'>
+              <text class='clearfix'>
+              <text class='pull-left'>工</text>
+              <text class='pull-right'>作</text>
+              </text>
+              <view class='menu-btn'>
+                <image wx:if='{{userState.myJobId.length>0}}' src='../../img/icon-menu.png' bindtap='showMyJob'></image>
+                <image wx:else src='../../img/icon-menu-dis.png'></image>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+    <view class='pull-right'>
+      <view class='pull-right-inner'>
+        <view class='icon-left'></view>
+        <view class='icon-right'></view>
+        <view class='title-img'>
+          <image src="../../img/title-right.png" mode="widthFix" style='height:auto'></image>
+          <image src='../../img/ques.png' class='ask' bindtap='actionTip'></image>
+        </view>
+        <view class='right-inner'>
+          <view bindtap="actionJob" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="ationJob">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box  clearfix {{userState.jobLimit==0?"":"disable"}}'>
+                <image src='../../img/btn-1.png'></image>
+                <text>找份工作</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box  clearfix {{userState.jobLimit==0?"":"disable"}}' bindtap='actionJob'>
+            <image src='../../img/btn-1.png'></image>
+            <text>找份工作</text>
+          </view> -->
+          <view bindtap="actionPlan" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionPlan">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.hours>0?"":"disable"}}'>
+                <image src='../../img/btn-2.png'></image>
+                <text>四处逛逛</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.hours>0?"":"disable"}}' bindtap='actionPlan'>
+            <image src='../../img/btn-2.png'></image>
+            <text>四处逛逛</text>
+          </view> -->
+          <view bindtap="actionFund" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionFund">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.fundLimit==0?"":"disable"}}'>
+                <image src='../../img/btn-3.png'></image>
+                <text>理财投资</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.fundLimit==0?"":"disable"}}' bindtap='actionFund'>
+            <image src='../../img/btn-3.png'></image>
+            <text>理财投资</text>
+          </view> -->
+          <view bindtap="actionLuck" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionLuck">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.luckLimit==0?"":"disable"}}'>
+                <image src='../../img/btn-4.png'></image>
+                <text>时来运转</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.luckLimit==0?"":"disable"}}' bindtap='actionLuck'>
+            <image src='../../img/btn-4.png'></image>
+            <text>时来运转</text>
+          </view> -->
+
+          <!--male prop-->
+
+          <view bindtap='actionHouse' wx:if="{{userData.gender==1}}" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionHouse">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.houseLimit==0?"":"disable"}}' >
+                <image src='../../img/btn-8.png'></image>
+                <text>购房置业</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.houseLimit==0?"":"disable"}}' bindtap='actionHouse' wx:if="{{userData.gender==1}}">
+            <image src='../../img/btn-8.png'></image>
+            <text>购房置业</text>
+          </view> -->
+          <view bindtap='actionCar' wx:if="{{userData.gender==1}}" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionCar">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.carLimit==0?"":"disable"}}' >
+                <image src='../../img/btn-9.png'></image>
+                <text>座驾排场</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.carLimit==0?"":"disable"}}' bindtap='actionCar' wx:if="{{userData.gender==1}}">
+            <image src='../../img/btn-9.png'></image>
+            <text>座驾排场</text>
+          </view> -->
+
+          <!--female prop-->
+          <view bindtap='actionClothes' wx:if="{{userData.gender==2}}" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionClothes">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.clothesLimit==0?"":"disable"}}'>
+                <image src='../../img/btn-10.png'></image>
+                <text>着装衣品</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.clothesLimit==0?"":"disable"}}' bindtap='actionClothes' wx:if="{{userData.gender==2}}">
+            <image src='../../img/btn-10.png'></image>
+            <text>着装衣品</text>
+          </view> -->
+
+          <view bindtap='actionLuxury' wx:if="{{userData.gender==2}}" style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionLuxury">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.luxuryLimit==0?"":"disable"}}' >
+                <image src='../../img/btn-12.png'></image>
+                <text>妆容排场</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.luxuryLimit==0?"":"disable"}}' bindtap='actionLuxury' wx:if="{{userData.gender==2}}">
+            <image src='../../img/btn-12.png'></image>
+            <text>妆容排场</text>
+          </view> -->
+          <!--common prop-->
+          <view bindtap='actionCouple' style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionCouple">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix {{userState.coupleLimit==0?"":"disable"}}' >
+                <image src='../../img/btn-6.png'></image>
+                <text>儿女情长</text>
+              </view>
+            </form>
+          </view>
+          <view  style="position:relative"  >
+            <form bindsubmit="pushFormSubmit" report-submit='true' data-action="actionNew">
+              <button style='-webkit-transform: scale(0.5);transform:scale(1);content:"";height:90rpx; width: 100%;border:1px solid transparent;background-color:transparent; position: absolute; top: 0; left: 0' plain="true" formType="submit"></button>
+              <view class='btn-box clearfix disable' >
+                <image src='../../img/gift.png'></image>
+                <text>贵人相助</text>
+              </view>
+            </form>
+          </view>
+          <!-- <view class='btn-box clearfix {{userState.coupleLimit==0?"":"disable"}}' bindtap='actionCouple'>
+            <image src='../../img/btn-6.png'></image>
+            <text>儿女情长</text>
+          </view> -->
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+<!-- 随机事件弹出begin -->
+<view class='mask' hidden='{{!maskShow}}'></view>
+
+<template is='popTip' data='{{tipShow,tipItems,userData}}'></template>
+<template is='popNight' data='{{nightClass,nightText,nightTip}}'></template>
+<template is='popDialog' data='{{dialogShow,dialogResult,dialogBtn,dialogPic}}'></template>
+<template is='popJob' data='{{jobShow,jobItems,userState}}'></template>
+<template is='popPlan' data='{{planShow,planItems,userState}}'></template>
+<template is='popHouse' data='{{houseShow,houseItems,userState}}'></template>
+<template is='popCar' data='{{carShow,carItems,userState}}'></template>
+<template is='popClothes' data='{{clothesShow,clothesItems,userState}}'></template>
+<template is='popLuxury' data='{{luxuryShow,luxuryItems,userState}}'></template>
+<template is='popLuck' data='{{luckShow,luckItems,userState}}'></template>
+<template is='popCouple' data='{{coupleShow,coupleItems,userState,coupleState,userData}}'></template>
+<template is='popEvent' data='{{eventShow,eventItems,eventTitle}}'></template>
+
+<template is='popFund' data='{{fundShow,fundItems,userState}}'></template>
+<template is='popFundDetail' data='{{fundDetailShow,canvasHeight, canvasWidth,fundItem,userState,fundMoney,diffMoney,sellMoney,buyMoney}}'></template>
+
+
+
+<template is='popMyJob' data='{{myJobShow,jobItems,userState}}'></template>
+<template is='popMyCar' data='{{myCarShow,carItems,userState}}'></template>
+<template is='popMyHouse' data='{{myHouseShow,houseItems,userState}}'></template>
+<template is='popMyClothes' data='{{myClothesShow,clothesItems,userState}}'></template>
+<template is='popMyLuxury' data='{{myLuxuryShow,luxuryItems,userState}}'></template>
+<template is='popMyCouple' data='{{myCoupleShow,coupleItems,userState,userData}}'></template>
+<!-- 随机事件弹出over -->
+<!-- 今日安排弹出begin -->
+
+<!-- 今日安排弹出over -->
+<!-- 游戏列表begin -->
+
+<!-- 游戏列表over -->
