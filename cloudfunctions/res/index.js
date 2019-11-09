@@ -24,7 +24,9 @@ exports.main = async (event, context) => {
   
   app.router('data', commonService.getResData)
 
+  app.router('start', commonService.start)
 
+  app.router('init', commonService.init)
   // app.router('data', async (ctx, next) => {
   //   try {
   //     let {

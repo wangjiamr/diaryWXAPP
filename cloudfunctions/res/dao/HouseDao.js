@@ -1,14 +1,12 @@
 const cloud = require('wx-server-sdk')
 
-class PlanDao {
+class HouseDao {
 
-  async getList(gender) {
+  async getList() {
     const db = cloud.database()
     let data = {}
 
-    await db.collection('res_plan').where({
-      gender: gender
-    }).orderBy('displayOrder', 'asc').get().then(res => {
+    await db.collection('res_house').orderBy('buyPrice', 'asc').get().then(res => {
       data = res.data
     })
 
@@ -20,17 +18,16 @@ class PlanDao {
   async init() {
     const db = cloud.database()
     let jobDataArray = []
-    await db.collection('res_plan').get().then(res => {
+    await db.collection('res_house').get().then(res => {
       jobDataArray = res.data
     })
-    console.info(jobDataArray.length + '    ok');
     if (jobDataArray.length > 0) {
       for (let job of jobDataArray) {
-        db.collection('res_plan_effect').where({ planId: job.id }).update({ data: { _planId: job._id } })
+        db.collection('res_house_effect').where({ houseId: job.id }).update({ data: { _houseId: job._id } })
 
         console.info(job._id + '    ok');
       }
     }
   }
 }
-module.exports = PlanDao
+module.exports = HouseDao
