@@ -1,11 +1,11 @@
 const cloud = require('wx-server-sdk')
 
-class UserHouseDao {
+class UserClothesDao {
 
   async getListByUserId(userId) {
     const db = cloud.database()
     let data = []
-    await db.collection('user_house').where({
+    await db.collection('user_clothes').where({
       _userId: userId
     }).get().then(res => {
       if (res.data.length > 0) {
@@ -20,7 +20,7 @@ class UserHouseDao {
   async add(data) {
     const db = cloud.database()
     let data = {}
-    await db.collection('user_house').add({
+    await db.collection('user_clothes').add({
       data
     }).then(res => {
       data = res._id
@@ -28,4 +28,4 @@ class UserHouseDao {
     return data
   }
 }
-module.exports = UserHouseDao
+module.exports = UserClothesDao

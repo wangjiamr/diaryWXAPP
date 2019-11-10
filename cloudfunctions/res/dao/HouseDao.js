@@ -4,15 +4,13 @@ class HouseDao {
 
   async getList() {
     const db = cloud.database()
-    let data = {}
+    let data = []
 
     await db.collection('res_house').orderBy('buyPrice', 'asc').get().then(res => {
       data = res.data
     })
 
-    return {
-      data
-    }
+    return data
   }
 
   async init() {

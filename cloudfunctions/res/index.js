@@ -2,6 +2,7 @@
 const cloud = require('wx-server-sdk')
 const TcbRouter = require('tcb-router');
 const CommonService = require('./service/CommonService.js');
+const UserJobService = require('./service/UserJobService.js');
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 })
@@ -15,6 +16,8 @@ exports.main = async (event, context) => {
   
   const commonService = new CommonService()
 
+  const userJobService = new UserJobService()
+
   app.use(async (ctx, next) => {
     ctx.data = {}
     ctx.data.OPENID = wxContext.OPENID
@@ -27,6 +30,10 @@ exports.main = async (event, context) => {
   app.router('start', commonService.start)
 
   app.router('init', commonService.init)
+
+  app.router('applyJob', userJobService.applyJob)
+
+  app.router('refresh', commonService.refresh)
   // app.router('data', async (ctx, next) => {
   //   try {
   //     let {

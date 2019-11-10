@@ -4,7 +4,7 @@ class UserCarDao {
 
   async getListByUserId(userId) {
     const db = cloud.database()
-    let data = {}
+    let data = []
     await db.collection('user_car').where({
       _userId: userId
     }).get().then(res => {

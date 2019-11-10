@@ -22,5 +22,25 @@ class UserLimitDao {
       })
     return limitCount
   }
+
+  async save(saveData, persistent) {
+    const db = cloud.database()
+    let data = {}
+    if (persistent === 'add') {
+      await db.collection('user_limit').add({
+        data: saveData
+      }).then(res => {
+        data = res._id
+      })
+    } else if (persistent === 'update') {
+      const id = saveData['_id']
+      delete saveData['_id']
+      await db.collection('user_limit').doc(id).update({
+        data: saveData
+      }).then(res => {
+      })
+    }
+    return data
+  }
 }
 module.exports = UserLimitDao

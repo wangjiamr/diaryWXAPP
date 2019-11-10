@@ -142,7 +142,6 @@ const options = {
         userInfo
       }
     }).then(res => {
-      console.info(res)
       if(res.result.code==0){
         const resData = res.result.data
         wx.setStorageSync('userId', resData.userData._id)
@@ -157,19 +156,6 @@ const options = {
           lastComment: resData.userData.lastComment,
           submitFlag: false,
           waitLoading: false
-        })
-
-
-
-        wx.cloud.callFunction({
-          name: 'res',
-          data: {
-            $url: "data",
-            userId: app.globalData.userId
-          }
-        }).then(res => {
-          console.info(res)
-        }).catch(err => {
         })
       }
       wx.hideLoading()
@@ -238,7 +224,7 @@ const options = {
         nightClass: 'show'
       })
       if (!this.data.hasLogin) {
-        if (app.globalData.userData.userId) {
+        if (app.globalData.userId) {
           that.setData({
             userData: app.globalData.userData,
             hasLogin: true,
@@ -260,49 +246,79 @@ const options = {
   },
   resData: function() {
     const that = this
-    wxGet('/user/resData/' + that.data.userData.userId,
-      false,
-      ({
-        data
-      }) => {
-        //  console.info(data)
-        if (data.errorCode === 0) {
-          that.setData({
-            planItems: data.planArray,
-            jobItems: data.jobArray,
-            carItems: data.carArray,
-            houseItems: data.houseArray,
-            clothesItems: data.clothesArray,
-            luxuryItems: data.luxuryArray,
-            coupleItems: data.coupleArray,
-            luckItems: data.luckArray,
-            tipItems: data.tipArray,
-            fundItems: data.fundArray
-          })
-        }
-      })
+    wx.cloud.callFunction({
+      name: 'res',
+      data: {
+        $url: "data",
+        userId: app.globalData.userId
+      }
+    }).then(res => {
+      console.info(res)
+      const { errorCode, data} = res.result
+      if (errorCode === 0) {
+        that.setData({
+          planItems: data.planArray,
+          jobItems: data.jobArray,
+          carItems: data.carArray,
+          houseItems: data.houseArray,
+          clothesItems: data.clothesArray,
+          luxuryItems: data.luxuryArray,
+          coupleItems: data.coupleArray,
+          luckItems: data.luckArray,
+          tipItems: data.tipArray,
+          fundItems: data.fundArray
+        })
+      }
+    }).catch(err => {
+    })
+    // wxGet('/user/resData/' + that.data.userData.userId,
+    //   false,
+    //   ({
+    //     data
+    //   }) => {
+    //     //  console.info(data)
+    //     if (data.errorCode === 0) {
+    //       that.setData({
+    //         planItems: data.planArray,
+    //         jobItems: data.jobArray,
+    //         carItems: data.carArray,
+    //         houseItems: data.houseArray,
+    //         clothesItems: data.clothesArray,
+    //         luxuryItems: data.luxuryArray,
+    //         coupleItems: data.coupleArray,
+    //         luckItems: data.luckArray,
+    //         tipItems: data.tipArray,
+    //         fundItems: data.fundArray
+    //       })
+    //     }
+    //   })
   },
   start: function() {
     const that = this
-    wxPost('/user/start', {
-        userId: that.data.userData.userId
-      },
-      ({
-        data
-      }) => {
+    console.info('start')
+    wx.cloud.callFunction({
+      name: 'res',
+      data: {
+        $url: "start",
+        userId: app.globalData.userId
+      }
+    }).then(res => {
+      console.info(res)
+      const { errorCode, data } = res.result
+      if (errorCode === 0) {
         if (data.newGame) {
           that.getEventStack().init(true)
         }
         that.voiceContext().playNextDay()
         parseUserState(data, that)
-        setTimeout(function() {
+        setTimeout(function () {
           that.setData({
             nightText: data.nightText,
             hasUserInfo: true,
             nightTip: '四处逛逛,生活节奏慢点可能触发偶遇'
           })
         }, 1200)
-        setTimeout(function() {
+        setTimeout(function () {
           that.setData({
             nightClass: 'show hide',
             nightText: '',
@@ -317,7 +333,7 @@ const options = {
             }
           })
         }, 2500)
-        setTimeout(function() {
+        setTimeout(function () {
           that.setData({
             nightClass: ''
           })
@@ -333,7 +349,58 @@ const options = {
           that.autoTip()
         }, 3500)
       }
-    )
+    }).catch(err => {
+    })
+    // wxPost('/user/start', {
+    //     userId: that.data.userData.userId
+    //   },
+    //   ({
+    //     data
+    //   }) => {
+    //     if (data.newGame) {
+    //       that.getEventStack().init(true)
+    //     }
+    //     that.voiceContext().playNextDay()
+    //     parseUserState(data, that)
+    //     setTimeout(function() {
+    //       that.setData({
+    //         nightText: data.nightText,
+    //         hasUserInfo: true,
+    //         nightTip: '四处逛逛,生活节奏慢点可能触发偶遇'
+    //       })
+    //     }, 1200)
+    //     setTimeout(function() {
+    //       that.setData({
+    //         nightClass: 'show hide',
+    //         nightText: '',
+    //         nightTip: ''
+    //       })
+    //       wx.setNavigationBarColor({
+    //         frontColor: '#ffffff',
+    //         backgroundColor: '#2e55af',
+    //         animation: {
+    //           duration: 1000,
+    //           timingFunc: 'easeIn'
+    //         }
+    //       })
+    //     }, 2500)
+    //     setTimeout(function() {
+    //       that.setData({
+    //         nightClass: ''
+    //       })
+    //       if (data.resultArray) {
+    //         that.setData({
+    //           dialogPic: 'tishi',
+    //           maskShow: true,
+    //           dialogShow: true,
+    //           dialogResult: data.resultArray
+    //         })
+    //         that.resultVoice(data)
+    //       }
+    //       that.autoTip()
+    //     }, 3500)
+    //   }
+    // )
   },
   nextDay: function(e) {
     const that = this
@@ -355,7 +422,7 @@ const options = {
       })
       wxPost(
         '/user/nextDay', {
-          userId: that.data.userData.userId
+          userId: app.globalData.userId
         },
         ({
           data
@@ -436,18 +503,18 @@ const options = {
   pushFormSubmit: function(e) {
     if (e) {
       console.info(e)
-      if (app.globalData.userData && e.detail.formId) {
-        e.target.dataset.action
-        wxPost('/user/submit', {
-          'userId': app.globalData.userData.userId,
-          'formId': e.detail.formId,
-          'action': e.target.dataset.action
-        }, ({
-          data
-        }) => {
-          console.info(data)
-        })
-      }
+      // if (app.globalData.userData && e.detail.formId) {
+      //   e.target.dataset.action
+      //   wxPost('/user/submit', {
+      //     'userId': app.globalData.userData.userId,
+      //     'formId': e.detail.formId,
+      //     'action': e.target.dataset.action
+      //   }, ({
+      //     data
+      //   }) => {
+      //     console.info(data)
+      //   })
+      // }
     }
   },
 

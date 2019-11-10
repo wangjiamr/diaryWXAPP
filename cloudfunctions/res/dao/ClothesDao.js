@@ -4,7 +4,7 @@ class ClothesDao {
 
   async getList(gender) {
     const db = cloud.database()
-    let data = {}
+    let data = []
 
     await db.collection('res_clothes').where({
       gender: gender
@@ -12,9 +12,7 @@ class ClothesDao {
       data = res.data
     })
 
-    return {
-      data
-    }
+    return data
   }
 
   async init() {

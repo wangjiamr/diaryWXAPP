@@ -4,7 +4,7 @@ class UserFundDao {
 
   async getListByUserId(userId) {
     const db = cloud.database()
-    let data = {}
+    let data = []
     await db.collection('user_fund').where({
       _userId: userId
     }).get().then(res => {

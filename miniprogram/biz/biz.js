@@ -212,9 +212,16 @@ function storeMixin(options) {
       const that=this
       if (that.data.userState.live) {
         that.voiceContext().playClick()
-        wxGet('/user/refresh/' + that.data.userData.userId,
-          false,
-          ({ data }) => {
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "refresh",
+            userId: that.data.userData._id
+          }
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
             parseUserState(data, that)
             closeMaskNavigationBarColor()
             if (data.userState.live) {
@@ -224,10 +231,28 @@ function storeMixin(options) {
               that.setData({ maskShow: false, dialogShow: false })
               that.voiceContext().playOver()
               setTimeout(function () {
-                that.setData({ maskShow: true, dialogShow: true,dialogResult: data.resultArray })
+                that.setData({ maskShow: true, dialogShow: true, dialogResult: data.resultArray })
               }, 2000)
             }
-          })
+          }
+        }).catch(err => {
+        })
+        // wxGet('/user/refresh/' + that.data.userData.userId,
+        //   false,
+        //   ({ data }) => {
+        //     parseUserState(data, that)
+        //     closeMaskNavigationBarColor()
+        //     if (data.userState.live) {
+        //       that.setData({ maskShow: false, dialogShow: false, dialogPic: 'jieguo' })
+        //       that.autoTip()
+        //     } else {
+        //       that.setData({ maskShow: false, dialogShow: false })
+        //       that.voiceContext().playOver()
+        //       setTimeout(function () {
+        //         that.setData({ maskShow: true, dialogShow: true,dialogResult: data.resultArray })
+        //       }, 2000)
+        //     }
+        //   })
       }else{
         that.done()
       }

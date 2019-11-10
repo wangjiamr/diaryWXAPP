@@ -105,7 +105,7 @@
           <view>{{item.remarks}}</view>
         </view>
         <view wx:if='{{userState.myJobId===item.id}}' class='job-btn in-job disable' ></view>
-        <view wx:else class='job-btn  {{userState.jobLimit==0?"":"disable"}}' bindtap='applyJob' data-id='{{item.id}}'></view>
+        <view wx:else class='job-btn  {{userState.jobLimit==0?"":"disable"}}' bindtap='applyJob' data-id='{{item._id}}'></view>
       </view>
     </view>
   </view>

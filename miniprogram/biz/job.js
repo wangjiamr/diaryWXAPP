@@ -57,20 +57,43 @@ export default {
       that.setData({ submitFlag: true })
       let jobId = e.currentTarget.dataset.id
       if(jobId){
-        wxPost(
-          '/user/applyJob',
-          {
-            userId:that.data.userData.userId,
-            jobId:jobId
-          },
-          ({ data }) => {
-            if(data.errorCode>=0){
-              that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data)
-             // that.getEventStack().push({ category: 'random-job' })
-            }
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "applyJob",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
+            jobId: jobId
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+            that.resultVoice(data)
+          }
+          wx.hideLoading()
+        }).catch(err => {
+          that.setData({
+            waitLoading: false
+          })
+          wx.hideLoading()
+
+        })
+        // wxPost(
+        //   '/user/applyJob',
+        //   {
+        //     userId:that.data.userData.userId,
+        //     jobId:jobId
+        //   },
+        //   ({ data }) => {
+        //     if(data.errorCode>=0){
+        //       that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data)
+        //      // that.getEventStack().push({ category: 'random-job' })
+        //     }
+        //   }
+        // )
       }
     }
   }
