@@ -179,15 +179,13 @@ function storeMixin(options) {
     resultVoice: function (data,luckWin){
       const that = this
       if (data){
-        if (data.errorCode == 0) {
-          if (luckWin){
-            that.voiceContext().playWin()
-          }else{
-            that.voiceContext().playResult()
-          }
-        } else if (data.errorCode == 1) {
-          that.voiceContext().playFail()
+        if (luckWin) {
+          that.voiceContext().playWin()
+        } else {
+          that.voiceContext().playResult()
         }
+      }else{
+        that.voiceContext().playFail()
       }
     },
     autoTip:function(){

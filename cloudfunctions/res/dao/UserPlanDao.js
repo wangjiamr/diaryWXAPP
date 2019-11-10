@@ -1,15 +1,15 @@
 const cloud = require('wx-server-sdk')
 
-class UserCarDao {
+class UserPlanDao {
 
   async getListByUserId(userId) {
     const db = cloud.database()
     let data = []
-    await db.collection('user_car').where({
+    await db.collection('user_plan').where({
       _userId: userId
     }).get().then(res => {
       if (res.data.length > 0) {
-        data = res.data
+        data = res.data[0]
       } else {
         data = false
       }
@@ -21,7 +21,7 @@ class UserCarDao {
     const db = cloud.database()
     let data = {}
     if (persistent === 'add') {
-      await db.collection('user_car').add({
+      await db.collection('user_plan').add({
         data: saveData
       }).then(res => {
         data = res._id
@@ -29,12 +29,13 @@ class UserCarDao {
     } else if (persistent === 'update') {
       const id = saveData['_id']
       delete saveData['_id']
-      await db.collection('user_car').doc(id).update({
+      await db.collection('user_plan').doc(id).update({
         data: saveData
       }).then(res => {
       })
     }
     return data
   }
+
 }
-module.exports = UserCarDao
+module.exports = UserPlanDao

@@ -72,12 +72,7 @@ export default {
             that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
             that.resultVoice(data)
           }
-          wx.hideLoading()
         }).catch(err => {
-          that.setData({
-            waitLoading: false
-          })
-          wx.hideLoading()
 
         })
         // wxPost(

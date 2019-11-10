@@ -441,9 +441,10 @@ async function loadUserData(data, userId, gender) {
       const fundLimit = results[5]
 
       let userState = data.userState
+      userState.currentDay = currentDay(userDay)
       man(userState, jobLimit, luckLimit, houseLimit, carLimit, coupleLimit, fundLimit)
 
-      data.currentDay = currentDay(userDay)
+     
       data.nightText = '第' + dayText(userDay) + '天'
       if (data.newGame) {
         let resultArray = []

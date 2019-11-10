@@ -58,20 +58,38 @@ export default {
       that.setData({ submitFlag: true })
       let carId = e.currentTarget.dataset.id
       if (carId) {
-        wxPost(
-          '/user/buyCar',
-          {
-            userId: that.data.userData.userId,
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "buyCar",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
             carId: carId
-          },
-          ({ data }) => {
-            if (data.errorCode >= 0) {
-              that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data)
-            }
-            console.info(data)
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+            that.resultVoice(data)
+          }
+        }).catch(err => {
+
+        })
+        // wxPost(
+        //   '/user/buyCar',
+        //   {
+        //     userId: that.data.userData.userId,
+        //     carId: carId
+        //   },
+        //   ({ data }) => {
+        //     if (data.errorCode >= 0) {
+        //       that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data)
+        //     }
+        //     console.info(data)
+        //   }
+        // )
       }
     }
   },

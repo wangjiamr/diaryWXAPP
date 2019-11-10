@@ -5,7 +5,7 @@ const {
   requirePass,
   useEffect,
   diffEffectMan,
-  diffEffectLady
+  diffEffectLady, failAttrNames
 } = require('../utils/GameUtils.js')
 const CommonResponse = require('../utils/CommonResponse.js')
 const JobDao = require('../dao/JobDao.js')
@@ -41,7 +41,7 @@ class UserJobService {
     if (gender == 1) {
       userObj = await userManDao.getByUserId(userId)
     } else {
-      userObj = await userManDao.getByUserId(userId)
+      userObj = await userLadyDao.getByUserId(userId)
     }
 
     let jobRequireGet = new Promise((resolve, reject) => {
@@ -107,7 +107,6 @@ async function proccess(userId,
     let effectArray = []
     if (gender == 1) {
       effectArray = diffEffectLady(oldUserObj, userObj)
-      console.info(JSON.stringify(userObj))
       await userManDao.save(userObj, 'update')
     } else {
       effectArray = diffEffectLady(oldUserObj, userObj)
@@ -119,7 +118,19 @@ async function proccess(userId,
     addResultArray(resultArray, '最终:', effectArray)
     data.resultArray = resultArray
   } else {
-
+    if (userJobLimitGetResult==1){
+      let resultArray = []
+      addResultArray(resultArray, '抱歉，每日只能应聘一次工作！', false)
+      data.resultArray = resultArray
+    }else{
+      let resultArray = []
+      let failAttrName = []
+      failAttrName = failAttrNames(jobRequireGetResult,userObj,gender)
+      await userLimitDao.save(jobLimitData, 'add')
+      addResultArray(resultArray, '你卖力的表现了下自己，但是面试官觉得你的能力无法胜任这份工作！', false)
+      addResultArray(resultArray, '要求:', failAttrName)
+      data.resultArray = resultArray
+    }
   }
 }
 module.exports = UserJobService

@@ -372,6 +372,37 @@ exports.diffValue = (resultEffect, value1, value2, gender, key) => {
     }
   }
 }
+
+exports.failAttrNames = (requireList, userObj, gender) => {
+  let failArray = []
+  if (requireList && requireList.length > 0) {
+    for (let require of requireList) {
+      let requireKey = require['attrKey'].toLowerCase()
+      if (requireKey) {
+        let userValue = userObj[requireKey]
+        if (userValue) {
+          userValue = parseInt(userValue)
+          let requireValue = require['value']
+          if (requireValue) {
+            requireValue = parseInt(requireValue)
+            if (userValue < requireValue) {
+              let jsonObject={}
+              jsonObject.op='sub'
+              if (gender == 1) {
+                jsonObject.attrName = exports.getAttrNameMan(requireKey)
+              }else{
+                jsonObject.attrName = exports.getAttrNameLady(requireKey)
+              }
+              jsonObject.value = requireValue
+              failArray.push(jsonObject)
+            }
+          }
+        }
+      }
+    }
+  }
+  return failArray
+}
 exports.getAttrNameMan = (attrKey) => {
   let attrName = ''
   attrKey = attrKey.toUpperCase()
@@ -434,4 +465,26 @@ exports.getAttrNameLady = (attrKey) => {
       break
   }
   return attrName
+}
+
+exports.useHour = (userObj) => {
+  if (userObj) {
+    let days = userObj['days']
+    let hours = userObj['hours']
+    if (days && hours) {
+      days = parseInt(days)
+      hours = parseInt(hours)
+      if (hours > 0) {
+        hours = hours - 1
+        userObj['hours'] = hours
+      }
+    }
+  }
+}
+exports.dynamicPrice = (day, price, offset) => {
+  offset = offset * exports.currentDay(day)
+  offset = 100 + offset
+  let dyPrice = exports.toDecimal(price * offset)
+  dyPrice = exports.toDecimal(dyPrice / 100)
+  return parseInt(Math.round(dyPrice))
 }

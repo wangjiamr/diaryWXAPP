@@ -13,6 +13,28 @@ class CarDao {
     return data
   }
 
+  async getById(carId) {
+    const db = cloud.database()
+    let data = {}
+
+    await db.collection('res_car').doc(carId).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
+  async getEffectListByCarId(carId) {
+    const db = cloud.database()
+    let data = []
+
+    await db.collection('res_car_effect').where({
+      _carId: carId
+    }).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
   async init() {
     const db = cloud.database()
     let jobDataArray = []
