@@ -43,6 +43,7 @@ exports.main = async (event, context) => {
 
 
   app.router('buyCar', userCarService.buyCar)
+  app.router('sellCar', userCarService.sellCar)
 
   app.router('refresh', commonService.refresh)
   // app.router('data', async (ctx, next) => {

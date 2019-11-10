@@ -5,8 +5,26 @@ class UserCarDao {
   async getListByUserId(userId) {
     const db = cloud.database()
     let data = []
+    console.info(userId)
     await db.collection('user_car').where({
       _userId: userId
+    }).get().then(res => {
+      console.info(JSON.stringify(res))
+      if (res.data.length > 0) {
+        data = res.data
+      } else {
+        data = false
+      }
+    })
+    return data
+  }
+
+  async getListByUserIdCarId(userId,carId) {
+    const db = cloud.database()
+    let data = []
+    await db.collection('user_car').where({
+      _userId: userId,
+      _carId:carId
     }).get().then(res => {
       if (res.data.length > 0) {
         data = res.data
@@ -34,6 +52,14 @@ class UserCarDao {
       }).then(res => {
       })
     }
+    return data
+  }
+
+  async deleteById(id) {
+    const db = cloud.database()
+    let data = {}
+    await db.collection('user_car').doc(id).remove().then(res => {
+    })
     return data
   }
 }

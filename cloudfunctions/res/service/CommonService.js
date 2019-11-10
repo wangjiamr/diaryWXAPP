@@ -326,19 +326,14 @@ async function loadUserData(data, userId, gender) {
       const totalMoney = results[0]
       const userFundList = results[1]
       const coupleGetResult = results[2]
-      const userCarList = results[3]
-      const userHouseList = results[4]
-      const userJob = results[5]
-      const userCouple = results[6]
+      const userCarList = results[2]
+      const userHouseList = results[3]
+      const userJob = results[4]
+      const userCouple = results[5]
 
       userState.fund = formatNumber(totalMoney, 0, true)
 
-      if (userJob) {
-        data.myJobId = userJob._id
-      }
-      if (userCouple) {
-        data.myCoupleId = userCouple._id
-      }
+      
 
       let myFundArray = []
       let myFundDiff = {}
@@ -398,7 +393,16 @@ async function loadUserData(data, userId, gender) {
       }
       userState.myHouseArray = myHouseArray
       userState.myHouseNumber = myHouseNumber
-
+      if (userJob) {
+        userState.myJobId = userJob._id
+      }else{
+        userState.myJobId = ''
+      }
+      if (userCouple) {
+        userState.myCoupleId = userCouple._id
+      }else{
+        userState.myCoupleId = ''
+      }
       data.userState = userState
     }).catch((error) => {
       console.log(error)
