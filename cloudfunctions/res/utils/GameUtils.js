@@ -510,3 +510,31 @@ exports.dynamicPrice = (day, price, offset) => {
   dyPrice = exports.toDecimal(dyPrice / 100)
   return parseInt(Math.round(dyPrice))
 }
+exports.callName = (gender) => {
+  return gender == 2 ? "小姑娘" : "小伙子"
+}
+
+exports.lottery = (orignalRates) => {
+  if (!orignalRates || orignalRates.length==0){
+    return -1
+  }
+  let size = orignalRates.length
+
+  let sumRate=0.0
+  for (let rate of orignalRates) {
+    sumRate += rate
+  }
+
+  let sortOrignalRates=[]
+  let tempSumRate=0
+  for (let rate of orignalRates) {
+    tempSumRate += rate
+    sortOrignalRates.push(tempSumRate / sumRate)
+  }
+
+  let nextDouble = Math.random()
+
+  sortOrignalRates.push(nextDouble)
+  sortOrignalRates.sort()
+  return sortOrignalRates.indexOf(nextDouble)
+}
