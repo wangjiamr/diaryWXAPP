@@ -106,7 +106,7 @@ async function proccess(userId,
     await userJobDao.save(saveData, persistentJob)
     let effectArray = []
     if (gender == 1) {
-      effectArray = diffEffectLady(oldUserObj, userObj)
+      effectArray = diffEffectMan(oldUserObj, userObj)
       await userManDao.save(userObj, 'update')
     } else {
       effectArray = diffEffectLady(oldUserObj, userObj)

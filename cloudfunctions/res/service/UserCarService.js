@@ -150,11 +150,13 @@ async function buyProccess(userId,
 
       useEffect(carEffectGetResult, userObj)
 
-      effectArray = diffEffectLady(oldUserObj, userObj)
+    
 
       if (gender == 1) {
+        effectArray = diffEffectMan(oldUserObj, userObj)
         await userManDao.save(userObj, 'update')
       } else {
+        effectArray = diffEffectLady(oldUserObj, userObj)
         await userLadyDao.save(userObj, 'update')
       }
       await userCarDao.save(userCarData, 'add')
@@ -196,11 +198,13 @@ async function sellProccess(userId,
 
     userObj['money'] = haveMoney + currentSellPrice
 
-    effectArray = diffEffectLady(oldUserObj, userObj)
+   
 
     if (gender == 1) {
+      effectArray = diffEffectMan(oldUserObj, userObj)
       await userManDao.save(userObj, 'update')
     } else {
+      effectArray = diffEffectLady(oldUserObj, userObj)
       await userLadyDao.save(userObj, 'update')
     }
     await userCarDao.deleteById(sellUserCarId)

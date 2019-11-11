@@ -170,6 +170,28 @@ exports.man = (userMan, jobLimit, luckLimit, houseLimit, carLimit, coupleLimit, 
   }
 }
 
+
+exports.lady = (userLady, jobLimit, luckLimit, clothesLimit, luxuryLimit, coupleLimit, fundLimit) => {
+  if (userLady) {
+    userLady['jobLimit'] = jobLimit
+    userLady['luckLimit'] = luckLimit
+    userLady['clothesLimit'] = clothesLimit
+    userLady['luxuryLimit'] = luxuryLimit
+    userLady['coupleLimit'] = coupleLimit
+    userLady['fundLimit'] = fundLimit
+
+    exports.minish(userLady)
+    userLady['moneyNumber'] = userLady['money']
+    userLady['health'] = exports.formatNumber(userLady['health'], 0, true)
+    userLady['money'] = exports.formatNumber(userLady['money'], 0, true)
+    userLady['ability'] = exports.formatNumber(userLady['ability'], 0, true)
+    userLady['wisdom'] = exports.formatNumber(userLady['wisdom'], 0, true)
+    userLady['happy'] = exports.formatNumber(userLady['happy'], 0, true)
+    userLady['beauty'] = exports.formatNumber(userLady['beauty'], 0, true)
+    userLady['popularity'] = exports.formatNumber(userLady['popularity'], 0, true)
+  }
+}
+
 exports.currentDay = (day) => {
   return exports.gameDays() - day
 }

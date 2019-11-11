@@ -15,6 +15,28 @@ class ClothesDao {
     return data
   }
 
+  async getById(clothesId) {
+    const db = cloud.database()
+    let data = {}
+
+    await db.collection('res_clothes').doc(clothesId).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
+  async getEffectListByCarId(clothesId) {
+    const db = cloud.database()
+    let data = []
+
+    await db.collection('res_clothes_effect').where({
+      _clothesId: clothesId
+    }).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
   async init() {
     const db = cloud.database()
     let jobDataArray = []

@@ -88,7 +88,12 @@ async function proccess(userId,
       }
       let oldUserObj = Object.assign({}, userObj)
       useEffect(planEffectList, userObj)
-      let effectArray = diffEffectLady(oldUserObj, userObj)
+      let effectArray = []
+      if (gender == 1) {
+        effectArray = diffEffectMan(oldUserObj, userObj)
+      }else{
+        effectArray = diffEffectLady(oldUserObj, userObj)
+      }
       useHour(userObj)
       await userPlanDao.save(userPlanData, 'add')
       await userManDao.save(userObj, 'update')

@@ -52,19 +52,38 @@ export default {
       that.setData({ submitFlag: true })
       let clothesId = e.currentTarget.dataset.id
       if (clothesId) {
-        wxPost(
-          '/user/buyClothes',
-          {
-            userId: that.data.userData.userId,
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "buyClothes",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
             clothesId: clothesId
-          },
-          ({ data }) => {
-            if (data.errorCode >= 0) {
-              that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data)
-            }
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+            that.resultVoice(data)
+          }
+        }).catch(err => {
+
+        })
+
+        // wxPost(
+        //   '/user/buyClothes',
+        //   {
+        //     userId: that.data.userData.userId,
+        //     clothesId: clothesId
+        //   },
+        //   ({ data }) => {
+        //     if (data.errorCode >= 0) {
+        //       that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data)
+        //     }
+        //   }
+        // )
       }
     }
   },
@@ -77,20 +96,39 @@ export default {
       that.setData({ submitFlag: true })
       let clothesId = e.currentTarget.dataset.id
       if (clothesId) {
-        wxPost(
-          '/user/sellClothes',
-          {
-            userId: that.data.userData.userId,
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "sellClothes",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
             clothesId: clothesId
-          },
-          ({ data }) => {
-            if (data.errorCode >= 0) {
-            //  that.getEventStack().push({ category: 'random-clothes' })
-              that.setData({ submitFlag: false, [foldShow]: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data)
-            }
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            that.setData({ submitFlag: false, [foldShow]: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+            that.resultVoice(data)
+          }
+        }).catch(err => {
+
+        })
+
+        // wxPost(
+        //   '/user/sellClothes',
+        //   {
+        //     userId: that.data.userData.userId,
+        //     clothesId: clothesId
+        //   },
+        //   ({ data }) => {
+        //     if (data.errorCode >= 0) {
+        //     //  that.getEventStack().push({ category: 'random-clothes' })
+        //       that.setData({ submitFlag: false, [foldShow]: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data)
+        //     }
+        //   }
+        // )
       }
     }
   }

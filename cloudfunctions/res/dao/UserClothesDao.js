@@ -17,6 +17,22 @@ class UserClothesDao {
     return data
   }
 
+  async getListByUserIdCarId(userId, clothesId) {
+    const db = cloud.database()
+    let data = []
+    await db.collection('user_clothes').where({
+      _userId: userId,
+      _clothesId: clothesId
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        data = res.data
+      } else {
+        data = false
+      }
+    })
+    return data
+  }
+
   async save(saveData, persistent) {
     const db = cloud.database()
     let data = {}
@@ -34,6 +50,14 @@ class UserClothesDao {
       }).then(res => {
       })
     }
+    return data
+  }
+
+  async deleteById(id) {
+    const db = cloud.database()
+    let data = {}
+    await db.collection('user_clothes').doc(id).remove().then(res => {
+    })
     return data
   }
 }

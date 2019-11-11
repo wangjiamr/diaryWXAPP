@@ -17,6 +17,22 @@ class UserHouseDao {
     return data
   }
 
+  async getListByUserIdHouseId(userId, houseId) {
+    const db = cloud.database()
+    let data = []
+    await db.collection('user_house').where({
+      _userId: userId,
+      _houseId: houseId
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        data = res.data
+      } else {
+        data = false
+      }
+    })
+    return data
+  }
+
   async save(saveData, persistent) {
     const db = cloud.database()
     let data = {}
@@ -34,6 +50,14 @@ class UserHouseDao {
       }).then(res => {
       })
     }
+    return data
+  }
+
+  async deleteById(id) {
+    const db = cloud.database()
+    let data = {}
+    await db.collection('user_house').doc(id).remove().then(res => {
+    })
     return data
   }
 }

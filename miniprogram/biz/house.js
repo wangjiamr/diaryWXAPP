@@ -59,20 +59,38 @@ export default {
       that.setData({ submitFlag: true })
       let houseId = e.currentTarget.dataset.id
       if (houseId) {
-        wxPost(
-          '/user/buyHouse',
-          {
-            userId: that.data.userData.userId,
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "buyHouse",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
             houseId: houseId
-          },
-          ({ data }) => {
-            if (data.errorCode >= 0) {
-              that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data)
-            }
-            console.info(data)
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+            that.resultVoice(data)
+          }
+        }).catch(err => {
+
+        })
+        // wxPost(
+        //   '/user/buyHouse',
+        //   {
+        //     userId: that.data.userData.userId,
+        //     houseId: houseId
+        //   },
+        //   ({ data }) => {
+        //     if (data.errorCode >= 0) {
+        //       that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data)
+        //     }
+        //     console.info(data)
+        //   }
+        // )
       }
     }
   },
@@ -85,20 +103,38 @@ export default {
       that.setData({ submitFlag: true })
       let houseId = e.currentTarget.dataset.id
       if (houseId) {
-        wxPost(
-          '/user/sellHouse',
-          {
-            userId: that.data.userData.userId,
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "sellHouse",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
             houseId: houseId
-          },
-          ({ data }) => {
-            if (data.errorCode >= 0) {
-              //that.getEventStack().push({ category: 'random-house' })
-              that.setData({ submitFlag: false, [foldShow]: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data)
-            }
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            that.setData({ submitFlag: false, [foldShow]: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+            that.resultVoice(data)
+          }
+        }).catch(err => {
+
+        })
+        // wxPost(
+        //   '/user/sellHouse',
+        //   {
+        //     userId: that.data.userData.userId,
+        //     houseId: houseId
+        //   },
+        //   ({ data }) => {
+        //     if (data.errorCode >= 0) {
+        //       //that.getEventStack().push({ category: 'random-house' })
+        //       that.setData({ submitFlag: false, [foldShow]: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data)
+        //     }
+        //   }
+        // )
       }
     }
   }
