@@ -564,7 +564,7 @@
                 <view class='job'>{{item.title}}</view>
                 <view class='money'>
                     <text class='{{tools.arrayContain(userState.myFundArray,item._id)?"":"disable"}}'>{{tools.arrayContain(userState.myFundArray,item._id)?'已投资':'未投资'}}</text>
-                    <text class='percent {{item.increase>0?"up":"down"}}'>{{item.increase}}%</text>
+                     <text   class='percent {{item.increase>0?"up":"down"}}'>{{item.increase}}%</text>
                     <image src='../../img/arrow-{{item.increase>0?"up":"down"}}.png' mode='widthFix'></image>
                 </view>
                 <view>{{item.remarks}}</view>

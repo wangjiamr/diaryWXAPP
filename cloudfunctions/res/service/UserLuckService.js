@@ -28,6 +28,7 @@ class UserLuckService {
 
   constructor() {}
 
+
   async applyLuck(ctx, next) {
     const event = ctx._req.event
     let {

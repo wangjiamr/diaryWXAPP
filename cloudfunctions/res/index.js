@@ -9,6 +9,7 @@ const UserHouseService = require('./service/UserHouseService.js')
 const UserClothesService = require('./service/UserClothesService.js')
 const UserLuxuryService = require('./service/UserLuxuryService.js')
 const UserLuckService = require('./service/UserLuckService.js')
+const UserFundService = require('./service/UserFundService.js')
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 })
@@ -35,6 +36,10 @@ exports.main = async (event, context) => {
   const userLuxuryService = new UserLuxuryService()
 
   const userLuckService = new UserLuckService()
+
+  const userFundService = new UserFundService()
+
+  
 
   app.use(async (ctx, next) => {
     ctx.data = {}
@@ -68,6 +73,8 @@ exports.main = async (event, context) => {
   app.router('sellLuxury', userLuxuryService.sellLuxury)
 
   app.router('applyLuck', userLuckService.applyLuck)
+
+  app.router('fundMarket', userFundService.market)
 
 
   app.router('refresh', commonService.refresh)

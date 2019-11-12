@@ -61,25 +61,48 @@ export default {
     }
   },
   actionFund: function () {
-    if (this.data.hangOn && this.data.eventShow) return 
+    const that = this
+    if (that.data.hangOn && that.data.eventShow) return 
     showMaskNavigationBarColor()
-    this.setData({ [show]: true, maskShow: true })
-    this.voiceContext().playClick()
+    that.setData({ [show]: true, maskShow: true })
+    that.voiceContext().playClick()
 
-    const userId = this.data.userData.userId
-    wxGet('/user/fund/market',{userId},
-      (({data})=>{
-        if (data.errorCode >= 0) {
-          let array = this.data[items]
-          array.forEach(o=>{
-            o['increase'] = data[o.id] ? data[o.id]:0
-          })
-          this.setData({
-            [items]:array
-          })
-        }
-      })
-    )
+
+    wx.cloud.callFunction({
+      name: 'res',
+      data: {
+        $url: "fundMarket",
+        userId: that.data.userData._id,
+        gender: that.data.userData.gender
+      }
+    }).then(res => {
+      console.info(res)
+      const { errorCode, data } = res.result
+      if (errorCode >= 0) {
+        let array = that.data[items]
+        array.forEach(o => {
+          o['increase'] = data[o._id] ? data[o._id] : 0
+        })
+        that.setData({
+          [items]: array
+        })
+      }
+    }).catch(err => {
+
+    })
+    // wxGet('/user/fund/market',{userId},
+    //   (({data})=>{
+    //     if (data.errorCode >= 0) {
+    //       let array = this.data[items]
+    //       array.forEach(o=>{
+    //         o['increase'] = data[o.id] ? data[o.id]:0
+    //       })
+    //       this.setData({
+    //         [items]:array
+    //       })
+    //     }
+    //   })
+    // )
   },
   closeFund: function () {
     closeMaskNavigationBarColor()
