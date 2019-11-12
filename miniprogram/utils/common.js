@@ -51,7 +51,6 @@ exports.wxGet = (url, paramData, successCallback, failCallback, completeCallback
 
 exports.parseUserState = (data, that) => {
   // console.info(data)
-  if (data.errorCode == 0) {
     for (var i = 0; i < data.attrList.length; i++) {
       data.attrList[i]['textArray'] = data.attrList[i]['text'].split('')
       data.attrList[i]['length'] = data.attrList[i]['text'].length
@@ -79,7 +78,6 @@ exports.parseUserState = (data, that) => {
       attrList: data.attrList,
       userState: data.userState
     })
-  }
 }
 exports.showMaskNavigationBarColor = () => {
   wx.setNavigationBarColor({

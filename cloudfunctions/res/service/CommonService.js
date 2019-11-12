@@ -2,12 +2,15 @@ const {
   minish,
   attrList,
   formatNumber,
-  man,
+  man, lady,
   currentDay,
+  gameDays,
   initDays,
-  initHours
+  initHours,
+  dayText,
+  addResultArray
 } = require('../utils/GameUtils.js')
-const CommonResponse = require('../entity/CommonResponse.js')
+const CommonResponse = require('../utils/CommonResponse.js')
 const SettingDao = require('../dao/SettingDao.js')
 const JobDao = require('../dao/JobDao.js')
 const PlanDao = require('../dao/PlanDao.js')
@@ -28,6 +31,8 @@ const UserJobDao = require('../dao/UserJobDao.js')
 const UserCoupleDao = require('../dao/UserCoupleDao.js')
 const UserCarDao = require('../dao/UserCarDao.js')
 const UserHouseDao = require('../dao/UserHouseDao.js')
+const UserClothesDao = require('../dao/UserClothesDao.js')
+const UserLuxuryDao = require('../dao/UserLuxuryDao.js')
 const UserLimitDao = require('../dao/UserLimitDao.js')
 
 
@@ -51,6 +56,8 @@ const userJobDao = new UserJobDao()
 const userCoupleDao = new UserCoupleDao()
 const userCarDao = new UserCarDao()
 const userHouseDao = new UserHouseDao()
+const userClothesDao = new UserClothesDao()
+const userLuxuryDao = new UserLuxuryDao()
 const userLimitDao = new UserLimitDao()
 
 class CommonService {
@@ -125,7 +132,10 @@ class CommonService {
         const luckGetResult = results[3]
         const fundGetResult = results[4]
         const tipGetResult = results[5]
-        let carGetResult, houseGetResult, clothesGetResult, luxuryGetResult
+        let carGetResult = [],
+          houseGetResult = [],
+          clothesGetResult = [],
+          luxuryGetResult = []
         if (user.gender == 1) {
           carGetResult = results[6]
           houseGetResult = results[7]
@@ -133,16 +143,27 @@ class CommonService {
           clothesGetResult = results[6]
           luxuryGetResult = results[7]
         }
-        data.jobArray = minish(jobGetResult)
-        data.planArray = minish(planGetResult)
-        data.coupleArray = minish(coupleGetResult)
-        data.luckArray = minish(luckGetResult)
-        data.fundArray = minish(fundGetResult)
-        data.tipArray = minish(tipGetResult)
-        data.carArray = minish(carGetResult)
-        data.houseArray = minish(houseGetResult)
-        data.clothesArray = minish(clothesGetResult)
-        data.luxuryArray = minish(luxuryGetResult)
+        minish(jobGetResult)
+        minish(planGetResult)
+        minish(coupleGetResult)
+        minish(luckGetResult)
+        minish(fundGetResult)
+        minish(tipGetResult)
+        minish(carGetResult)
+        minish(houseGetResult)
+        minish(clothesGetResult)
+        minish(luxuryGetResult)
+
+        data.jobArray = jobGetResult
+        data.planArray = planGetResult
+        data.coupleArray = coupleGetResult
+        data.luckArray = luckGetResult
+        data.fundArray = fundGetResult
+        data.tipArray = tipGetResult
+        data.carArray = carGetResult
+        data.houseArray = houseGetResult
+        data.clothesArray = clothesGetResult
+        data.luxuryArray = luxuryGetResult
       }).catch((error) => {
         console.log(error)
       })
@@ -157,13 +178,17 @@ class CommonService {
     let {
       userId
     } = event
-    let data = {}
+    let data = {
+      newGame: false
+    }
     let result = CommonResponse(-1, 'fail', data)
     const user = await userDao.getUserById(userId)
     if (user) {
+      let userObj = false
       if (user.gender == 1) {
-        let userMan = await userManDao.getByUserId(userId)
-        if (!userMan) {
+        userObj = await userManDao.getByUserId(userId)
+        if (!userObj) {
+          data.newGame = true
           let userManData = {
             _userId: userId,
             health: 100,
@@ -178,20 +203,82 @@ class CommonService {
             score: 0
           }
           console.info(userManData)
-          const addId = await userManDao.add(userManData)
+          const addId = await userManDao.save(userManData, 'add')
           if (addId) {
-            userMan = await userManDao.getById(addId)
+            userObj = await userManDao.getById(addId)
           }
         }
-
+      } else {
+        userObj = await userLadyDao.getByUserId(userId)
+        if (!userObj) {
+          data.newGame = true
+          let userLadyData = {
+            _userId: userId,
+            health: 100,
+            money: 8000,
+            ability: 100,
+            wisdom: 100,
+            happy: 100,
+            beauty: 100,
+            popularity: 100,
+            days: initDays(),
+            hours: initHours(),
+            score: 0
+          }
+          console.info(userLadyData)
+          const addId = await userLadyDao.save(userLadyData, 'add')
+          if (addId) {
+            userObj = await userLadyDao.getById(addId)
+          }
+        }
+      }
+      if (userObj) {
         const updateState = await userDao.incPlayNumber(userId)
         if (updateState > 0) {
 
-          data.userMan = userMan
+          data.userState = userObj
           await loadUserData(data, userId, user.gender)
+
+          const userDay = data.userState.days
+
+          data.nightText = '第' + dayText(userDay) + '天'
+          if (data.newGame) {
+            let resultArray = []
+            addResultArray(resultArray, '北京是你的舞台，初到北京，给你8000启动资金。', false)
+            addResultArray(resultArray, '你可以先找份最初级工作，这样每天可以获得工资。安顿好后要多四处逛逛见见市面，提高你的个人成长能力。', false)
+            addResultArray(resultArray, '看' + gameDays() + '天后你能混出什么样来', false)
+            data.resultArray = resultArray
+          }
 
           result = CommonResponse(0, 'success', data)
         }
+      }
+
+    }
+    ctx.body = result
+  }
+
+  async refresh(ctx, next) {
+    const event = ctx._req.event
+    let {
+      userId
+    } = event
+    let data = {
+      newGame: false
+    }
+    let result = CommonResponse(-1, 'fail', data)
+    const user = await userDao.getUserById(userId)
+    if (user) {
+      let userObj=false
+      if (user.gender == 1) {
+        userObj = await userManDao.getByUserId(userId)
+      }else{
+        userObj = await userLadyDao.getByUserId(userId)
+      }
+      if (userObj) {
+        data.userState = userObj
+        await loadUserData(data, userId, user.gender)
+        result = CommonResponse(0, 'success', data)
       }
     }
     ctx.body = result
@@ -232,8 +319,9 @@ class CommonService {
 }
 /* */
 async function loadUserData(data, userId, gender) {
-  console.info('*****=' + JSON.stringify(data))
-  data.userState = attrList(gender, 1)
+  data.attrList = attrList(gender, 1)
+  let userState = data.userState
+
   let totalMoneyGet = new Promise((resolve, reject) => {
     const totalMoney = userFundDao.getSumByUserId(userId)
     resolve(totalMoney)
@@ -256,11 +344,35 @@ async function loadUserData(data, userId, gender) {
 
   let live = true
 
-  if (gender == 1) {
+  if (data.userState.health < 0) {
+    live = false;
+  }
 
-    if (data.userMan.health < 0) {
-      live = false;
-    }
+  data.userState.live = live
+
+  const userDay = data.userState.days
+
+  let userJobLimitGet = new Promise((resolve, reject) => {
+    const jobLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'JOB')
+    resolve(jobLimit)
+  })
+  let userLuckLimitGet = new Promise((resolve, reject) => {
+    const luckLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'LUCK')
+    resolve(luckLimit)
+  })
+
+  let userCoupleLimitGet = new Promise((resolve, reject) => {
+    const coupleLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'COUPLE')
+    resolve(coupleLimit)
+  })
+  let userFundLimitGet = new Promise((resolve, reject) => {
+    const fundLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'FUND')
+    resolve(fundLimit)
+  })
+
+
+
+  if (gender == 1) {
 
     let userCarGet = new Promise((resolve, reject) => {
       const userCarList = userCarDao.getListByUserId(userId)
@@ -276,19 +388,14 @@ async function loadUserData(data, userId, gender) {
       const totalMoney = results[0]
       const userFundList = results[1]
       const coupleGetResult = results[2]
-      const userCarList = results[3]
-      const userHouseList = results[4]
-      const userJob = results[5]
-      const userCouple = results[6]
+      const userCarList = results[2]
+      const userHouseList = results[3]
+      const userJob = results[4]
+      const userCouple = results[5]
 
-      data.fund = formatNumber(totalMoney, 0, true)
+      userState.fund = formatNumber(totalMoney, 0, true)
 
-      if (userJob) {
-        data.myJobId = userJob._id
-      }
-      if (userCouple) {
-        data.myCoupleId = userCouple._id
-      }
+
 
       let myFundArray = []
       let myFundDiff = {}
@@ -304,11 +411,11 @@ async function loadUserData(data, userId, gender) {
         }
         diffFundMoney = sumFundMoney - sumFundBuy
       }
-      data.myFundArray = myFundArray
-      data.myFundDiff = myFundDiff
-      data.sumFundBuy = sumFundBuy
-      data.sumFundMoney = sumFundMoney
-      data.diffFundMoney = diffFundMoney
+      userState.myFundArray = myFundArray
+      userState.myFundDiff = myFundDiff
+      userState.sumFundBuy = sumFundBuy
+      userState.sumFundMoney = sumFundMoney
+      userState.diffFundMoney = diffFundMoney
 
 
 
@@ -328,8 +435,8 @@ async function loadUserData(data, userId, gender) {
         }
       }
 
-      data.myCarArray = myCarArray
-      data.myCarNumber = myCarNumber
+      userState.myCarArray = myCarArray
+      userState.myCarNumber = myCarNumber
 
       let myHouseArray = []
       let myHouseNumber = {}
@@ -346,23 +453,27 @@ async function loadUserData(data, userId, gender) {
           }
         }
       }
-      data.myHouseArray = myHouseArray
-      data.myHouseNumber = myHouseNumber
+      userState.myHouseArray = myHouseArray
+      userState.myHouseNumber = myHouseNumber
+      if (userJob) {
+        userState.myJobId = userJob._jobId
+      } else {
+        userState.myJobId = ''
+      }
+      if (userCouple) {
+        userState.myCoupleId = userCouple._coupleId
+      } else {
+        userState.myCoupleId = ''
+      }
+      data.userState = userState
     }).catch((error) => {
       console.log(error)
     })
 
-    const userDay = data.userMan.days
+    const userDay = data.userState.days
 
 
-    let userJobLimitGet = new Promise((resolve, reject) => {
-      const jobLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'JOB')
-      resolve(jobLimit)
-    })
-    let userLuckLimitGet = new Promise((resolve, reject) => {
-      const luckLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'LUCK')
-      resolve(luckLimit)
-    })
+   
     let userHouseLimitGet = new Promise((resolve, reject) => {
       const houseLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'HOUSE')
       resolve(houseLimit)
@@ -370,14 +481,6 @@ async function loadUserData(data, userId, gender) {
     let userCarLimitGet = new Promise((resolve, reject) => {
       const carLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'CAR')
       resolve(carLimit)
-    })
-    let userCoupleLimitGet = new Promise((resolve, reject) => {
-      const coupleLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'COUPLE')
-      resolve(coupleLimit)
-    })
-    let userFundLimitGet = new Promise((resolve, reject) => {
-      const fundLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'FUND')
-      resolve(fundLimit)
     })
 
     await Promise.all([userJobLimitGet, userLuckLimitGet, userHouseLimitGet, userCarLimitGet, userCoupleLimitGet, userFundLimitGet]).then((results) => {
@@ -388,13 +491,142 @@ async function loadUserData(data, userId, gender) {
       const coupleLimit = results[4]
       const fundLimit = results[5]
 
-      let userMan = data.userMan
-      man(userMan, jobLimit, luckLimit, houseLimit, carLimit, coupleLimit, fundLimit)
+      let userState = data.userState
+      userState.currentDay = currentDay(userDay)
+      man(userState, jobLimit, luckLimit, houseLimit, carLimit, coupleLimit, fundLimit)
 
-      data.currentDay = currentDay(userDay)
     }).catch((error) => {
       console.log(error)
     })
+  } else {
+    let userClothesGet = new Promise((resolve, reject) => {
+      const userClothesList = userClothesDao.getListByUserId(userId)
+      resolve(userClothesList)
+    })
+
+    let userLuxuryGet = new Promise((resolve, reject) => {
+      const userLuxuryList = userLuxuryDao.getListByUserId(userId)
+      resolve(userLuxuryList)
+    })
+
+    await Promise.all([totalMoneyGet, userFundGet, userClothesGet, userLuxuryGet, userJobGet, userCoupleGet]).then((results) => {
+      const totalMoney = results[0]
+      const userFundList = results[1]
+      const coupleGetResult = results[2]
+      const userClothesList = results[2]
+      const userLuxuryList = results[3]
+      const userJob = results[4]
+      const userCouple = results[5]
+
+
+      userState.fund = formatNumber(totalMoney, 0, true)
+
+
+
+      let myFundArray = []
+      let myFundDiff = {}
+      let sumFundBuy = 0
+      let sumFundMoney = 0
+      let diffFundMoney = 0
+      if (userFundList.length > 0) {
+        for (let userFund of userFundList) {
+          myFundArray.push(userFund._fundId)
+          myFundDiff[userFund._fundId] = formatNumber(userFund.money - userFund.buy, 0, true)
+          sumFundBuy += userFund.buy
+          sumFundMoney += userFund.money
+        }
+        diffFundMoney = sumFundMoney - sumFundBuy
+      }
+      userState.myFundArray = myFundArray
+      userState.myFundDiff = myFundDiff
+      userState.sumFundBuy = sumFundBuy
+      userState.sumFundMoney = sumFundMoney
+      userState.diffFundMoney = diffFundMoney
+
+
+
+      let myClothesArray = []
+      let myClothesNumber = {}
+      if (userClothesList.length > 0) {
+        let clothesSetIds = new Set()
+        for (let userClothes of userClothesList) {
+          if (!clothesSetIds.has(userClothes._clothesId)) {
+            myClothesNumber[userClothes._clothesId] = 1
+            myClothesArray.push(userClothes._clothesId)
+            clothesSetIds.add(userClothes._clothesId)
+          } else {
+            let clothesNumber = myClothesNumber[userClothes._clothesId]
+            myClothesNumber[userClothes._clothesId] = clothesNumber + 1
+          }
+        }
+      }
+
+      userState.myClothesArray = myClothesArray
+      userState.myClothesNumber = myClothesNumber
+
+      let myLuxuryArray = []
+      let myLuxuryNumber = {}
+      if (userLuxuryList.length > 0) {
+        let luxurySetIds = new Set()
+        for (let userLuxury of userLuxuryList) {
+          if (!luxurySetIds.has(userLuxury._luxuryId)) {
+            myLuxuryNumber[userLuxury._luxuryId] = 1
+            myLuxuryArray.push(userLuxury._luxuryId)
+            luxurySetIds.add(userLuxury._luxuryId)
+          } else {
+            let luxuryNumber = myLuxuryNumber[userLuxury._luxuryId]
+            myLuxuryNumber[userLuxury._luxuryId] = luxuryNumber + 1
+          }
+        }
+      }
+      userState.myLuxuryArray = myLuxuryArray
+      userState.myLuxuryNumber = myLuxuryNumber
+      
+      if (userJob) {
+        userState.myJobId = userJob._jobId
+      } else {
+        userState.myJobId = ''
+      }
+      if (userCouple) {
+        userState.myCoupleId = userCouple._coupleId
+      } else {
+        userState.myCoupleId = ''
+      }
+      data.userState = userState
+    }).catch((error) => {
+      console.log(error)
+    })
+
+   
+
+
+   
+    let userLuxuryLimitGet = new Promise((resolve, reject) => {
+      const luxuryLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'LUXURY')
+      resolve(luxuryLimit)
+    })
+    let userClothesLimitGet = new Promise((resolve, reject) => {
+      const clothesLimit = userLimitDao.getCountByUserIdDayAction(userId, userDay, 'CLOTHES')
+      resolve(clothesLimit)
+    })
+   
+
+    await Promise.all([userJobLimitGet, userLuckLimitGet, userLuxuryLimitGet, userClothesLimitGet, userCoupleLimitGet, userFundLimitGet]).then((results) => {
+      const jobLimit = results[0]
+      const luckLimit = results[1]
+      const luxuryLimit = results[2]
+      const clothesLimit = results[3]
+      const coupleLimit = results[4]
+      const fundLimit = results[5]
+
+      let userState = data.userState
+      userState.currentDay = currentDay(userDay)
+      lady(userState, jobLimit, luckLimit, clothesLimit, luxuryLimit, coupleLimit, fundLimit)
+
+    }).catch((error) => {
+      console.log(error)
+    })
+
   }
 
 }

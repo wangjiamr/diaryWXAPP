@@ -4,7 +4,7 @@ class UserHouseDao {
 
   async getListByUserId(userId) {
     const db = cloud.database()
-    let data = {}
+    let data = []
     await db.collection('user_house').where({
       _userId: userId
     }).get().then(res => {
@@ -17,13 +17,46 @@ class UserHouseDao {
     return data
   }
 
-  async add(data) {
+  async getListByUserIdHouseId(userId, houseId) {
+    const db = cloud.database()
+    let data = []
+    await db.collection('user_house').where({
+      _userId: userId,
+      _houseId: houseId
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        data = res.data
+      } else {
+        data = false
+      }
+    })
+    return data
+  }
+
+  async save(saveData, persistent) {
     const db = cloud.database()
     let data = {}
-    await db.collection('user_house').add({
-      data
-    }).then(res => {
-      data = res._id
+    if (persistent === 'add') {
+      await db.collection('user_house').add({
+        data: saveData
+      }).then(res => {
+        data = res._id
+      })
+    } else if (persistent === 'update') {
+      const id = saveData['_id']
+      delete saveData['_id']
+      await db.collection('user_house').doc(id).update({
+        data: saveData
+      }).then(res => {
+      })
+    }
+    return data
+  }
+
+  async deleteById(id) {
+    const db = cloud.database()
+    let data = {}
+    await db.collection('user_house').doc(id).remove().then(res => {
     })
     return data
   }

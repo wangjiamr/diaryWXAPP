@@ -4,7 +4,7 @@ class PlanDao {
 
   async getList(gender) {
     const db = cloud.database()
-    let data = {}
+    let data = []
 
     await db.collection('res_plan').where({
       gender: gender
@@ -12,10 +12,31 @@ class PlanDao {
       data = res.data
     })
 
-    return {
-      data
-    }
+    return data
   }
+
+  async getById(planId) {
+    const db = cloud.database()
+    let data = {}
+
+    await db.collection('res_plan').doc(planId).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
+  async getEffectListByPlanId(planId) {
+    const db = cloud.database()
+    let data = []
+
+    await db.collection('res_plan_effect').where({
+      _planId: planId
+    }).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
 
   async init() {
     const db = cloud.database()

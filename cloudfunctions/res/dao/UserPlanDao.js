@@ -1,11 +1,11 @@
 const cloud = require('wx-server-sdk')
 
-class UserJobDao {
+class UserPlanDao {
 
-  async getByUserId(userId) {
+  async getListByUserId(userId) {
     const db = cloud.database()
-    let data = {}
-    await db.collection('user_job').where({
+    let data = []
+    await db.collection('user_plan').where({
       _userId: userId
     }).get().then(res => {
       if (res.data.length > 0) {
@@ -20,8 +20,8 @@ class UserJobDao {
   async save(saveData, persistent) {
     const db = cloud.database()
     let data = {}
-    if (persistent==='add'){
-      await db.collection('user_job').add({
+    if (persistent === 'add') {
+      await db.collection('user_plan').add({
         data: saveData
       }).then(res => {
         data = res._id
@@ -29,7 +29,7 @@ class UserJobDao {
     } else if (persistent === 'update') {
       const id = saveData['_id']
       delete saveData['_id']
-      await db.collection('user_job').doc(id).update({
+      await db.collection('user_plan').doc(id).update({
         data: saveData
       }).then(res => {
       })
@@ -38,4 +38,4 @@ class UserJobDao {
   }
 
 }
-module.exports = UserJobDao
+module.exports = UserPlanDao

@@ -45,20 +45,39 @@ export default {
       that.setData({ submitFlag: true })
       let luckId = e.currentTarget.dataset.id
       if (luckId) {
-        wxPost(
-          '/user/applyLuck',
-          {
-            userId: that.data.userData.userId,
+
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "applyLuck",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
             luckId: luckId
-          },
-          ({ data }) => {
-            if (data.errorCode >= 0) {
-              //that.getEventStack().push({ category: 'random-luck' })
-              that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data,true)
-            }
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+            that.resultVoice(data, true)
+          }
+        }).catch(err => {
+
+        })
+        // wxPost(
+        //   '/user/applyLuck',
+        //   {
+        //     userId: that.data.userData.userId,
+        //     luckId: luckId
+        //   },
+        //   ({ data }) => {
+        //     if (data.errorCode >= 0) {
+        //       //that.getEventStack().push({ category: 'random-luck' })
+        //       that.setData({ submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data,true)
+        //     }
+        //   }
+        // )
       }
     }
   }

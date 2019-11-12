@@ -4,15 +4,35 @@ class HouseDao {
 
   async getList() {
     const db = cloud.database()
-    let data = {}
+    let data = []
 
     await db.collection('res_house').orderBy('buyPrice', 'asc').get().then(res => {
       data = res.data
     })
 
-    return {
-      data
-    }
+    return data
+  }
+
+  async getById(houseId) {
+    const db = cloud.database()
+    let data = {}
+
+    await db.collection('res_house').doc(houseId).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
+  async getEffectListByHouseId(houseId) {
+    const db = cloud.database()
+    let data = []
+
+    await db.collection('res_house_effect').where({
+      _houseId: houseId
+    }).get().then(res => {
+      data = res.data
+    })
+    return data
   }
 
   async init() {

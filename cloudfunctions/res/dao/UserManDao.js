@@ -26,15 +26,25 @@ class UserManDao {
     return data
   }
 
-  async add(userData) {
+  
+
+  async save(saveData, persistent) {
     const db = cloud.database()
     let data = {}
-    await db.collection('user_man').add({
-      data: userData
-    }).then(res => {
-      console.info('add data+' + JSON.stringify(res))
-      data = res._id
-    })
+    if (persistent === 'add') {
+      await db.collection('user_man').add({
+        data: saveData
+      }).then(res => {
+        data = res._id
+      })
+    } else if (persistent === 'update') {
+      const id = saveData['_id']
+      delete saveData['_id']
+      await db.collection('user_man').doc(id).update({
+        data: saveData
+      }).then(res => {
+      })
+    }
     return data
   }
 }

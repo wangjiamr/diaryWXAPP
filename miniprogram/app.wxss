@@ -357,7 +357,7 @@ page{overflow: hidden;}
 @font-face
 {
     font-family: 'numFont';
-    src:url('https://img.jinrongzhushou.com/audio/1.ttf') format('truetype');
+    src:url('https://6465-dev-ckehx-1257883881.tcb.qcloud.la/1.ttf?sign=db863613a81f3d76219418b0875eaef3&t=1573296019') format('truetype');
 }
 .numFont{
     font-family:'numFont';

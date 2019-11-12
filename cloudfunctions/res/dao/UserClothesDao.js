@@ -1,15 +1,13 @@
 const cloud = require('wx-server-sdk')
 
-class UserCarDao {
+class UserClothesDao {
 
   async getListByUserId(userId) {
     const db = cloud.database()
     let data = []
-    console.info(userId)
-    await db.collection('user_car').where({
+    await db.collection('user_clothes').where({
       _userId: userId
     }).get().then(res => {
-      console.info(JSON.stringify(res))
       if (res.data.length > 0) {
         data = res.data
       } else {
@@ -19,12 +17,12 @@ class UserCarDao {
     return data
   }
 
-  async getListByUserIdCarId(userId,carId) {
+  async getListByUserIdCarId(userId, clothesId) {
     const db = cloud.database()
     let data = []
-    await db.collection('user_car').where({
+    await db.collection('user_clothes').where({
       _userId: userId,
-      _carId:carId
+      _clothesId: clothesId
     }).get().then(res => {
       if (res.data.length > 0) {
         data = res.data
@@ -39,7 +37,7 @@ class UserCarDao {
     const db = cloud.database()
     let data = {}
     if (persistent === 'add') {
-      await db.collection('user_car').add({
+      await db.collection('user_clothes').add({
         data: saveData
       }).then(res => {
         data = res._id
@@ -47,7 +45,7 @@ class UserCarDao {
     } else if (persistent === 'update') {
       const id = saveData['_id']
       delete saveData['_id']
-      await db.collection('user_car').doc(id).update({
+      await db.collection('user_clothes').doc(id).update({
         data: saveData
       }).then(res => {
       })
@@ -58,9 +56,9 @@ class UserCarDao {
   async deleteById(id) {
     const db = cloud.database()
     let data = {}
-    await db.collection('user_car').doc(id).remove().then(res => {
+    await db.collection('user_clothes').doc(id).remove().then(res => {
     })
     return data
   }
 }
-module.exports = UserCarDao
+module.exports = UserClothesDao

@@ -4,7 +4,7 @@ class LuxuryDao {
 
   async getList(gender) {
     const db = cloud.database()
-    let data = {}
+    let data = []
 
     await db.collection('res_luxury').where({
       gender: gender
@@ -12,10 +12,31 @@ class LuxuryDao {
       data = res.data
     })
 
-    return {
-      data
-    }
+    return data
   }
+
+  async getById(luxuryId) {
+    const db = cloud.database()
+    let data = {}
+
+    await db.collection('res_luxury').doc(luxuryId).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
+  async getEffectListByLuxuryId(luxuryId) {
+    const db = cloud.database()
+    let data = []
+
+    await db.collection('res_luxury_effect').where({
+      _luxuryId: luxuryId
+    }).get().then(res => {
+      data = res.data
+    })
+    return data
+  }
+
   async init() {
     const db = cloud.database()
     let jobDataArray = []

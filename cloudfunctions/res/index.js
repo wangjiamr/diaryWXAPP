@@ -1,7 +1,14 @@
 // 云函数入口文件
 const cloud = require('wx-server-sdk')
-const TcbRouter = require('tcb-router');
-const CommonService = require('./service/CommonService.js');
+const TcbRouter = require('tcb-router')
+const CommonService = require('./service/CommonService.js')
+const UserJobService = require('./service/UserJobService.js')
+const UserPlanService = require('./service/UserPlanService.js')
+const UserCarService = require('./service/UserCarService.js')
+const UserHouseService = require('./service/UserHouseService.js')
+const UserClothesService = require('./service/UserClothesService.js')
+const UserLuxuryService = require('./service/UserLuxuryService.js')
+const UserLuckService = require('./service/UserLuckService.js')
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 })
@@ -15,6 +22,20 @@ exports.main = async (event, context) => {
   
   const commonService = new CommonService()
 
+  const userJobService = new UserJobService()
+
+  const userPlanService = new UserPlanService()
+
+  const userCarService = new UserCarService()
+
+  const userHouseService = new UserHouseService()
+
+  const userClothesService = new UserClothesService()
+
+  const userLuxuryService = new UserLuxuryService()
+
+  const userLuckService = new UserLuckService()
+
   app.use(async (ctx, next) => {
     ctx.data = {}
     ctx.data.OPENID = wxContext.OPENID
@@ -27,6 +48,29 @@ exports.main = async (event, context) => {
   app.router('start', commonService.start)
 
   app.router('init', commonService.init)
+
+  app.router('applyJob', userJobService.applyJob)
+
+  app.router('applyPlan', userPlanService.applyPlan)
+
+
+  app.router('buyCar', userCarService.buyCar)
+  app.router('sellCar', userCarService.sellCar)
+
+  app.router('buyHouse', userHouseService.buyHouse)
+  app.router('sellHouse', userHouseService.sellHouse)
+
+  app.router('buyClothes', userClothesService.buyClothes)
+  app.router('sellClothes', userClothesService.sellClothes)
+
+
+  app.router('buyLuxury', userLuxuryService.buyLuxury)
+  app.router('sellLuxury', userLuxuryService.sellLuxury)
+
+  app.router('applyLuck', userLuckService.applyLuck)
+
+
+  app.router('refresh', commonService.refresh)
   // app.router('data', async (ctx, next) => {
   //   try {
   //     let {

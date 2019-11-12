@@ -46,29 +46,57 @@ export default {
       that.setData({ submitFlag: true })
       let planId = e.currentTarget.dataset.id
       if (planId) {
-        wxPost(
-          '/user/applyPlan',
-          {
-            userId: that.data.userData.userId,
+        wx.cloud.callFunction({
+          name: 'res',
+          data: {
+            $url: "applyPlan",
+            userId: that.data.userData._id,
+            gender: that.data.userData.gender,
             planId: planId
-          },
-          ({ data }) => {
-            if (data.errorCode >= 0) {
-              if (Math.ceil(Math.random() * 100) > 35) {
-                that.getEventStack().push({ category: 'random',restart:true })
-              } else {
-                that.getEventStack().push({ category: 'random', restart: true})//删除plan的event 直接调用事件的event
-                //that.getEventStack().push({ id: planId, category: 'plan' })
-              }
-              that.setData({
-                findEventId:planId,
-                findEventType:'plan',
-                submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
-              that.resultVoice(data)
-            }
-           // console.info(data)
           }
-        )
+        }).then(res => {
+          console.info(res)
+          const { errorCode, data } = res.result
+          if (errorCode >= 0) {
+            if (Math.ceil(Math.random() * 100) > 35) {
+              that.getEventStack().push({ category: 'random', restart: true })
+            } else {
+              that.getEventStack().push({ category: 'random', restart: true })//删除plan的event 直接调用事件的event
+              //that.getEventStack().push({ id: planId, category: 'plan' })
+            }
+            that.setData({
+              findEventId: planId,
+              findEventType: 'plan',
+              submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray
+            })
+            that.resultVoice(data)
+          }
+        }).catch(err => {
+        })
+
+        // wxPost(
+        //   '/user/applyPlan',
+        //   {
+        //     userId: that.data.userData.userId,
+        //     planId: planId
+        //   },
+        //   ({ data }) => {
+        //     if (data.errorCode >= 0) {
+        //       if (Math.ceil(Math.random() * 100) > 35) {
+        //         that.getEventStack().push({ category: 'random',restart:true })
+        //       } else {
+        //         that.getEventStack().push({ category: 'random', restart: true})//删除plan的event 直接调用事件的event
+        //         //that.getEventStack().push({ id: planId, category: 'plan' })
+        //       }
+        //       that.setData({
+        //         findEventId:planId,
+        //         findEventType:'plan',
+        //         submitFlag: false, [show]: false, dialogShow: true, dialogResult: data.resultArray })
+        //       that.resultVoice(data)
+        //     }
+        //    // console.info(data)
+        //   }
+        // )
       }
     }
   }
