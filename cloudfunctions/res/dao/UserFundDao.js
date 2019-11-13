@@ -17,6 +17,22 @@ class UserFundDao {
     return data
   }
 
+  async getByUserFundId(userId, fundId) {
+    const db = cloud.database()
+    let data = {}
+    await db.collection('user_fund').where({
+      _userId: userId,
+      _fundId: fundId
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        data = res.data[0]
+      } else {
+        data = false
+      }
+    })
+    return data
+  }
+
   async getMarketByUserFundId(userId,fundId) {
     const db = cloud.database()
     let data = {}

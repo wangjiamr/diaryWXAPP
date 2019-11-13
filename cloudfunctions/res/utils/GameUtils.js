@@ -549,3 +549,14 @@ exports.fundMarket = (doubleList, minNum,maxNum) => {
   let market=parseFloat(temp+'.'+point)
   return market
 }
+exports.trade = (doubleList, minNum, maxNum) => {
+  let point = parseInt(Math.random() * (99 - 10), 10) + 10
+  let flagInt = exports.lottery(doubleList)
+  let temp = parseInt(Math.random() * (maxNum - minNum), 10) + minNum
+  if (flagInt == 1) {
+    temp = temp * -1
+  }
+  let market = parseFloat(temp + '.' + point)
+  return market
+}
+
