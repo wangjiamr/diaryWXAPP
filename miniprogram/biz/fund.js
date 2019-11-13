@@ -61,25 +61,48 @@ export default {
     }
   },
   actionFund: function () {
-    if (this.data.hangOn && this.data.eventShow) return 
+    const that = this
+    if (that.data.hangOn && that.data.eventShow) return 
     showMaskNavigationBarColor()
-    this.setData({ [show]: true, maskShow: true })
-    this.voiceContext().playClick()
+    that.setData({ [show]: true, maskShow: true })
+    that.voiceContext().playClick()
 
-    const userId = this.data.userData.userId
-    wxGet('/user/fund/market',{userId},
-      (({data})=>{
-        if (data.errorCode >= 0) {
-          let array = this.data[items]
-          array.forEach(o=>{
-            o['increase'] = data[o.id] ? data[o.id]:0
-          })
-          this.setData({
-            [items]:array
-          })
-        }
-      })
-    )
+
+    wx.cloud.callFunction({
+      name: 'res',
+      data: {
+        $url: "fundMarket",
+        userId: that.data.userData._id,
+        gender: that.data.userData.gender
+      }
+    }).then(res => {
+      console.info(res)
+      const { errorCode, data } = res.result
+      if (errorCode >= 0) {
+        let array = that.data[items]
+        array.forEach(o => {
+          o['increase'] = data[o._id] ? data[o._id] : 0
+        })
+        that.setData({
+          [items]: array
+        })
+      }
+    }).catch(err => {
+
+    })
+    // wxGet('/user/fund/market',{userId},
+    //   (({data})=>{
+    //     if (data.errorCode >= 0) {
+    //       let array = this.data[items]
+    //       array.forEach(o=>{
+    //         o['increase'] = data[o.id] ? data[o.id]:0
+    //       })
+    //       this.setData({
+    //         [items]:array
+    //       })
+    //     }
+    //   })
+    // )
   },
   closeFund: function () {
     closeMaskNavigationBarColor()
@@ -93,8 +116,8 @@ export default {
     this.voiceContext().playClick()
     //
     const that = this
-    const userId = that.data.userData.userId
-    const fundId = fundItem.id
+    const userId = that.data.userData._id
+    const fundId = fundItem._id
     setTimeout(()=>{
       this.setData({ fundDetailShow: true, maskShow: true })
 
@@ -117,18 +140,41 @@ export default {
     const that=this
     const dl = new DrawKLine()
     const cvs = wx.createCanvasContext('kline')
-    wxGet('/user/fund/trade', { userId, fundId },
-      (({ data }) => {
-        if (data.errorCode >= 0) {
-          const array = data.market['market']
-          dl.drawNewLine(array, cvs, that.data.canvasWidth, that.data.canvasHeight)
-          that.setData({
-            fundMoney: data.fundMoney,
-            diffMoney: data.diffMoney
-          })
-        }
-      })
-    )
+    wx.cloud.callFunction({
+      name: 'res',
+      data: {
+        $url: "fundTrade",
+        userId: that.data.userData._id,
+        gender: that.data.userData.gender,
+        fundId:fundId
+      }
+    }).then(res => {
+      console.info(res)
+      const { errorCode, data } = res.result
+      if (errorCode >= 0) {
+        const array = data.market
+        console.info(array)
+        dl.drawNewLine(array, cvs, that.data.canvasWidth, that.data.canvasHeight)
+        that.setData({
+          fundMoney: data.fundMoney,
+          diffMoney: data.diffMoney
+        })
+      }
+    }).catch(err => {
+
+    })
+    // wxGet('/user/fund/trade', { userId, fundId },
+    //   (({ data }) => {
+    //     if (data.errorCode >= 0) {
+    //       const array = data.market['market']
+    //       dl.drawNewLine(array, cvs, that.data.canvasWidth, that.data.canvasHeight)
+    //       that.setData({
+    //         fundMoney: data.fundMoney,
+    //         diffMoney: data.diffMoney
+    //       })
+    //     }
+    //   })
+    // )
   },
   closeFundDetail:function(){
     closeMaskNavigationBarColor()
